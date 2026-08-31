@@ -1,0 +1,20 @@
+Local: config-local.yaml
+
+Port: ${APP_PORT:-8000}
+
+Components:
+  WSServer:
+    Host: ${WS_HOST:-localhost}
+    Port: ${WS_PORT:-8001}
+    DefaultChannel:
+      Key: lobby
+      SharedData:
+        Name: lobby
+  JSPreprocessor:
+    CorePath: runtime/web/build/core.js
+    MapsPath: runtime/jspp
+    ModsPath: runtime/jspp/mods
+    PluginsPath: runtime/jspp/plugins
+    AssetLinksPath:
+      Inner: runtime/web/assets
+      Outer: /web

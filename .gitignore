@@ -1,0 +1,15 @@
+.idea
+
+lx-games-lobby/bin
+lx-games-lobby/runtime/.env
+lx-games-lobby/runtime/.sys
+lx-games-lobby/runtime/config-local.yaml
+lx-games-lobby/runtime/web/assets
+lx-games-lobby/runtime/web/build
+
+lx-games-cartridge/bin
+lx-games-cartridge/runtime/.env
+lx-games-cartridge/runtime/.sys
+lx-games-cartridge/runtime/config-local.yaml
+lx-games-cartridge/runtime/web/assets
+lx-games-cartridge/runtime/web/build

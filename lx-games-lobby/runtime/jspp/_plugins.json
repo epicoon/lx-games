@@ -1,0 +1,10 @@
+[
+  {
+    "path": "runtime/plugins/admin",
+    "name": "AdminPlugin"
+  },
+  {
+    "path": "runtime/plugins/lobby",
+    "name": "LobbyPlugin"
+  }
+]

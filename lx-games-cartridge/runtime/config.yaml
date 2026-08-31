@@ -1,0 +1,40 @@
+Local: config-local.yaml
+
+Port: ${APP_PORT:-8092}
+
+# This app's own cartridge identity, reported to the lobby in every
+# /nomenclature response - several nodes sharing the same CartridgeSlug
+# are several nodes of the same cartridge (for load-balancing), not
+# several different cartridges.
+CartridgeSlug: lxGames
+
+# The lobby itself - used to announce this app's startup (once, and
+# re-broadcast as a deregister on graceful shutdown over the WS connection
+# the lobby then establishes back), and for whatever other lobby endpoints
+# this app calls later - the specific path for each is this app's own
+# business, appended in code (see cartridgeAnnouncePath in
+# app/cartridge_setup.go), not part of this value. Empty/absent just means
+# "no lobby configured" - this app stays fully usable standalone either way.
+LobbyURL: ${LOBBY_URL:-http://localhost:8090}
+
+# The full addr announced to the lobby, when it needs to differ from
+# Components.WSServer.Host:Port below (see advertiseAddr in
+# app/cartridge_setup.go) - e.g. behind Docker's port publishing, where
+# WSServer binds "0.0.0.0" (meaningless to a remote caller) on some
+# internal port that isn't necessarily the one actually reachable from
+# outside. Empty/absent means "use Host:Port as the announced address too"
+# - the case for a plain, directly-reachable run.
+CartridgeAdvertiseAddr: ${CARTRIDGE_ADVERTISE_ADDR:-}
+
+Components:
+  WSServer:
+    Host: ${WS_HOST:-localhost}
+    Port: ${WS_PORT:-8093}
+  JSPreprocessor:
+    CorePath: runtime/web/build/core.js
+    MapsPath: runtime/jspp
+    ModsPath: runtime/jspp/mods
+    PluginsPath: runtime/jspp/plugins
+    AssetLinksPath:
+      Inner: runtime/web/assets
+      Outer: /web

@@ -1,0 +1,13 @@
+en-EN:
+  declineTitle: Your offer has been sent. But you can cancel it if you want.
+  decline: Cancel
+  declined: The deal was canceled by the opposite gamer.
+  ok: Ok
+  confirmTitle: Your offer has accepted. Confirm you are ready for deal.
+
+ru-RU:
+  declineTitle: Ваше предложение отправлено. Но вы можете его отменить, если хотите.
+  decline: Отменить
+  declined: Сделка была отменена противоположной стороной.
+  ok: Понятно
+  confirmTitle: Ваше предложение принято. Готовы к проведению сделки?

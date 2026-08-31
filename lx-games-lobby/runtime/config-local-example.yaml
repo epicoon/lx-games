@@ -1,0 +1,27 @@
+# The lobby only ever dials OUT to these cartridges - a cartridge announces
+# itself via POST /cartridge/announce, but the lobby is what actually
+# establishes the WS connection back, and only to a host:port already
+# listed here.
+RegistrySettings:
+  RequestTimeoutMs: 3000
+  RetryIntervalMs: 5000
+  MaxRetries: 5
+
+# Every cartridge this lobby is allowed to dial, as "host:port" - a real,
+# externally reachable address for wherever that cartridge actually runs
+# (a different server, a different Docker host, anything). Add or remove
+# entries directly in this file to change the set.
+Cartridges:
+  - localhost:8100
+
+Components:
+  WSServer:
+    MaxRequestsPerMinute: 10
+    MaxConnectionsPerIp: 5
+    ReconnectionAllowed: false
+    ReconnectionDuration: 5000
+    LifecycleLog: true
+    LifecycleError: true
+  JSPreprocessor:
+    Mode: DEV
+    PluginCacheType: dev
