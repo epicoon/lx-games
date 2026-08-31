@@ -1,0 +1,20 @@
+en-EN:
+  saveMenu: Saved games
+  gameName: Saved game name
+  save: Save
+  load: Load
+  yourSaves: Your saves
+  savesWithYou: Saves with you
+  allSaves: All saves
+  needGameName: Choose game name
+  gameSaved: The game has saved
+
+ru-RU:
+  saveMenu: Сохранённые игры
+  gameName: Имя сохраненной игры
+  load: Загрузить
+  yourSaves: Ваши сохранения
+  savesWithYou: Сохранения с Вами
+  allSaves: Все сохранения
+  needGameName: Укажите имя игры
+  gameSaved: Игра сохранена

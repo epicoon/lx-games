@@ -1,0 +1,289 @@
+[
+  {
+    "name": "lx.socket.WebSocketClient",
+    "path": "runtime/jspp/mods/lx/socket/WebSocketClient/WebSocketClient.js"
+  },
+  {
+    "name": "lx.socket.ChatBox",
+    "path": "runtime/jspp/mods/lx/socket/ChatBox/ChatBox.js",
+    "data": {
+      "i18n": "i18n.yaml",
+      "widget": "lx.MultiBox"
+    }
+  },
+  {
+    "name": "lx.CodeEditor",
+    "path": "runtime/jspp/mods/lx/CodeEditor/CodeEditor.js"
+  },
+  {
+    "name": "lx.Color",
+    "path": "runtime/jspp/mods/lx/Color.js"
+  },
+  {
+    "name": "lx.HashRouter",
+    "path": "runtime/jspp/mods/lx/HashRouter.js"
+  },
+  {
+    "name": "lx.MdHighlighter",
+    "path": "runtime/jspp/mods/lx/MdHighlighter/MdHighlighter.js"
+  },
+  {
+    "name": "lx.Plugin",
+    "path": "runtime/jspp/mods/PluginModule/PluginModule.js"
+  },
+  {
+    "name": "lx.TableManager",
+    "path": "runtime/jspp/mods/lx/TableManager.js"
+  },
+  {
+    "name": "lx.TestModule",
+    "path": "runtime/jspp/mods/lx/TestModule/TestModule.js"
+  },
+  {
+    "name": "lx.BasicCssContext",
+    "path": "runtime/jspp/mods/lx/BasicCssContext.js"
+  },
+  {
+    "name": "lx.CssPresetDark",
+    "path": "runtime/jspp/mods/lx/CssPresetDark.js"
+  },
+  {
+    "name": "lx.CssPresetWhite",
+    "path": "runtime/jspp/mods/lx/CssPresetWhite.js"
+  },
+  {
+    "name": "lx.SmoothOpener",
+    "path": "runtime/jspp/mods/lx/SmoothOpener.js"
+  },
+  {
+    "name": "lx.ActiveBox",
+    "path": "runtime/jspp/mods/lx/ActiveBox.js",
+    "data": {
+      "widget": "lx.ActiveBox"
+    }
+  },
+  {
+    "name": "lx.BoxSlider",
+    "path": "runtime/jspp/mods/lx/BoxSlider.js",
+    "data": {
+      "widget": "lx.BoxSlider"
+    }
+  },
+  {
+    "name": "lx.Button",
+    "path": "runtime/jspp/mods/lx/Button.js",
+    "data": {
+      "widget": "lx.Button"
+    }
+  },
+  {
+    "name": "lx.Calculator",
+    "path": "runtime/jspp/mods/lx/Calculator.js",
+    "data": {
+      "widget": "lx.Calculator"
+    }
+  },
+  {
+    "name": "lx.Calendar",
+    "path": "runtime/jspp/mods/lx/Calendar/Calendar.js",
+    "data": {
+      "i18n": "i18n.yaml",
+      "widget": "lx.Calendar"
+    }
+  },
+  {
+    "name": "lx.Checkbox",
+    "path": "runtime/jspp/mods/lx/Checkbox.js",
+    "data": {
+      "widget": "lx.Checkbox"
+    }
+  },
+  {
+    "name": "lx.CheckboxGroup",
+    "path": "runtime/jspp/mods/lx/CheckboxGroup.js",
+    "data": {
+      "widget": "lx.CheckboxGroup"
+    }
+  },
+  {
+    "name": "lx.ColorPicker",
+    "path": "runtime/jspp/mods/lx/ColorPicker/ColorPicker.js",
+    "data": {
+      "i18n": "i18n.yaml",
+      "widget": "lx.ColorPicker"
+    }
+  },
+  {
+    "name": "lx.ConfirmPopup",
+    "path": "runtime/jspp/mods/lx/ConfirmPopup/ConfirmPopup.js",
+    "data": {
+      "i18n": "i18n.yaml"
+    }
+  },
+  {
+    "name": "lx.Dropbox",
+    "path": "runtime/jspp/mods/lx/Dropbox.js",
+    "data": {
+      "widget": "lx.Dropbox"
+    }
+  },
+  {
+    "name": "lx.EggMenu",
+    "path": "runtime/jspp/mods/lx/EggMenu.js",
+    "data": {
+      "widget": "lx.EggMenu"
+    }
+  },
+  {
+    "name": "lx.Form",
+    "path": "runtime/jspp/mods/lx/Form.js",
+    "data": {
+      "widget": "lx.Form"
+    }
+  },
+  {
+    "name": "lx.Html",
+    "path": "runtime/jspp/mods/lx/Html.js"
+  },
+  {
+    "name": "lx.Image",
+    "path": "runtime/jspp/mods/lx/Image.js",
+    "data": {
+      "widget": "lx.Image"
+    }
+  },
+  {
+    "name": "lx.ImageSlider",
+    "path": "runtime/jspp/mods/lx/ImageSlider.js",
+    "data": {
+      "widget": "lx.ImageSlider"
+    }
+  },
+  {
+    "name": "lx.Input",
+    "path": "runtime/jspp/mods/lx/Input.js",
+    "data": {
+      "widget": "lx.Input"
+    }
+  },
+  {
+    "name": "lx.InputPopup",
+    "path": "runtime/jspp/mods/lx/InputPopup/InputPopup.js",
+    "data": {
+      "i18n": "i18n.yaml"
+    }
+  },
+  {
+    "name": "lx.JointMover",
+    "path": "runtime/jspp/mods/lx/JointMover.js",
+    "data": {
+      "widget": "lx.JointMover"
+    }
+  },
+  {
+    "name": "lx.LabeledGroup",
+    "path": "runtime/jspp/mods/lx/LabeledGroup.js",
+    "data": {
+      "widget": "lx.LabeledGroup"
+    }
+  },
+  {
+    "name": "lx.LanguageSwitcher",
+    "path": "runtime/jspp/mods/lx/LanguageSwitcher.js",
+    "data": {
+      "widget": "lx.LanguageSwitcher"
+    }
+  },
+  {
+    "name": "lx.Marks",
+    "path": "runtime/jspp/mods/lx/Marks.js",
+    "data": {
+      "widget": "lx.Marks"
+    }
+  },
+  {
+    "name": "lx.MatrixSwapper",
+    "path": "runtime/jspp/mods/lx/MatrixSwapper.js",
+    "data": {
+      "widget": "lx.MatrixSwapper"
+    }
+  },
+  {
+    "name": "lx.ModelsGrid",
+    "path": "runtime/jspp/mods/lx/ModelsGrid.js",
+    "data": {
+      "widget": "lx.ModelsGrid"
+    }
+  },
+  {
+    "name": "lx.MultiBox",
+    "path": "runtime/jspp/mods/lx/MultiBox.js",
+    "data": {
+      "widget": "lx.MultiBox"
+    }
+  },
+  {
+    "name": "lx.Paginator",
+    "path": "runtime/jspp/mods/lx/Paginator/Paginator.js",
+    "data": {
+      "i18n": "i18n.yaml",
+      "widget": "lx.Paginator"
+    }
+  },
+  {
+    "name": "lx.Radio",
+    "path": "runtime/jspp/mods/lx/Radio.js",
+    "data": {
+      "widget": "lx.Radio"
+    }
+  },
+  {
+    "name": "lx.RadioGroup",
+    "path": "runtime/jspp/mods/lx/RadioGroup.js",
+    "data": {
+      "widget": "lx.RadioGroup"
+    }
+  },
+  {
+    "name": "lx.Scroll",
+    "path": "runtime/jspp/mods/lx/Scroll.js",
+    "data": {
+      "widget": "lx.Scroll"
+    }
+  },
+  {
+    "name": "lx.Slider",
+    "path": "runtime/jspp/mods/lx/Slider.js",
+    "data": {
+      "widget": "lx.Slider"
+    }
+  },
+  {
+    "name": "lx.Switch",
+    "path": "runtime/jspp/mods/lx/Switch.js",
+    "data": {
+      "widget": "lx.Switch"
+    }
+  },
+  {
+    "name": "lx.Table",
+    "path": "runtime/jspp/mods/lx/Table.js",
+    "data": {
+      "widget": "lx.Table"
+    }
+  },
+  {
+    "name": "lx.Textarea",
+    "path": "runtime/jspp/mods/lx/Textarea.js",
+    "data": {
+      "widget": "lx.Textarea"
+    }
+  },
+  {
+    "name": "lx.TreeBox",
+    "path": "runtime/jspp/mods/lx/TreeBox.js",
+    "data": {
+      "widget": "lx.TreeBox"
+    }
+  }
+]

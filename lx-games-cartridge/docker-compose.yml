@@ -1,0 +1,11 @@
+services:
+  app:
+    container_name: lx-games-cartridge
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT_EXTERNAL}:${APP_PORT}"
+      - "${WS_PORT_EXTERNAL}:${WS_PORT}"
+    volumes:
+      - ./runtime:/app/runtime

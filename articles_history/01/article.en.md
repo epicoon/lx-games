@@ -1,3 +1,5 @@
+[LinkedIn](https://www.linkedin.com/pulse/lets-go-play-aleksei-sedov-btcuf)
+
 # Let's Go Play!
 
 ---

@@ -1,0 +1,28 @@
+name: SeabattlePlugin
+
+# --- Common ---
+images:
+  default: assets/images
+i18n: assets/i18n/main.yaml
+require:
+  - assets/css/
+cssAssets:
+  - lxGames.seabattle.MainCss
+
+cacheType: inherit
+
+
+# --- Server ---
+server:
+  rootSnippet: snippets/_root.js
+  snippets:
+    - snippets
+
+# --- Client ---
+client:
+  file: Plugin.js
+  require:
+    - guiNodes/
+
+  guiNodes:
+    main: lxGames.seabattle.GuiMain

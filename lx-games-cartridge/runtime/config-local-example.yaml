@@ -1,0 +1,11 @@
+Components:
+  WSServer:
+    MaxRequestsPerMinute: 10
+    MaxConnectionsPerIp: 5
+    ReconnectionAllowed: false
+    ReconnectionDuration: 5000
+    LifecycleLog: true
+    LifecycleError: true
+  JSPreprocessor:
+    Mode: DEV
+    PluginCacheType: dev
