@@ -38,3 +38,4 @@ Components:
     AssetLinksPath:
       Inner: runtime/web/assets
       Outer: /web
+    AppConfig: runtime/lx-app.yaml

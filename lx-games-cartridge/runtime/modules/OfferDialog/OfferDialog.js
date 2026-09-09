@@ -8,25 +8,25 @@ lx.import(
 );
 
 /*
-1. Покупатель отправляет напрямую событие владельцу
-    - у покупателя открывается окно ожидания, с кнопкой отмены
-    - у владельца открывается окно подтверждения сделки
+1. The buyer sends an event directly to the owner
+    - the buyer sees a waiting window with a cancel button
+    - the owner sees a deal confirmation window
 
-2.1. Владелец подтвердил
-    - отправляется прямое событие покупателю
-    - у покупателя окно ожидания заменяется окном окончательного подтверждения
-2.2. Владелец отказал
-    - отправляется прямое событие покупателю
-    - у покупателя окно ожидания заменяется сообщением об отказе
+2.1. The owner confirmed
+    - a direct event is sent to the buyer
+    - the buyer's waiting window is replaced with a final confirmation window
+2.2. The owner declined
+    - a direct event is sent to the buyer
+    - the buyer's waiting window is replaced with a decline message
     - END
-2.3. Покупатель отменил в процессе ожидания
-    - у владельца окно подтверждения сделки заменяется окном отмены
+2.3. The buyer cancelled while waiting
+    - the owner's deal confirmation window is replaced with a cancellation window
     - END
 
-3. Покупатель делает окончательное подтверждение
-    - отправляется событие с участием сервера
-    - последующая реакция клиентов
-    - закрытие попапов
+3. The buyer makes the final confirmation
+    - an event involving the server is sent
+    - clients react to it
+    - the popups close
  */
 // @lx:namespace lxGames;
 class OfferDialog {
@@ -50,7 +50,7 @@ class OfferDialog {
 
         const plugin = this.env.getPlugin();
         plugin.on('ENV_socketConnected', ()=>{
-            this.env.getSocket().onChannelEvent((e)=>__onEvent(this, e));
+            this.env.getSocket().onChannelEvent((e)=>_onEvent(this, e));
         });
     }
 
@@ -108,8 +108,8 @@ class OfferDialog {
             false
         );
 
-        // Отправителю повесить плашку "предложение отправлено" с кнопкой "передумал"
-        let popup = __getWaitingPopup(this);
+        // Show the sender an "offer sent" banner with a "changed my mind" button
+        let popup = _getWaitingPopup(this);
         popup.open(lx.i18n(declineTitle), {decline: lx.i18n(decline)}, 1)
             .decline(()=>{
                 delete this.requests[key];
@@ -124,7 +124,7 @@ class OfferDialog {
     }
 }
 
-function __getWaitingPopup(self) {
+function _getWaitingPopup(self) {
     if (!self.waitingPopup) {
         self.waitingPopup = new lx.ConfirmPopup({
             parent: self.popupsParentBox || lx.body,
@@ -134,7 +134,7 @@ function __getWaitingPopup(self) {
     return self.waitingPopup;
 }
 
-function __getConfirmPopup(self) {
+function _getConfirmPopup(self) {
     if (!self.confirmPopup) {
         self.confirmPopup = new lx.ConfirmPopup({
             parent: self.popupsParentBox || lx.body
@@ -143,7 +143,7 @@ function __getConfirmPopup(self) {
     return self.confirmPopup;
 }
 
-function __getDeclinePopup(self) {
+function _getDeclinePopup(self) {
     if (!self.declinePopup) {
         self.declinePopup = new lx.ConfirmPopup({
             parent: self.popupsParentBox || lx.body,
@@ -153,7 +153,7 @@ function __getDeclinePopup(self) {
     return self.declinePopup;
 }
 
-function __getFinalPopup(self) {
+function _getFinalPopup(self) {
     if (!self.finalPopup) {
         self.finalPopup= new lx.ConfirmPopup({
             parent: self.popupsParentBox || lx.body
@@ -162,7 +162,7 @@ function __getFinalPopup(self) {
     return self.finalPopup;
 }
 
-function __onEvent(self, event) {
+function _onEvent(self, event) {
     const data = event.getData();
     if (!data.__offer__ || !(data.__offer__.scenario in self.scenarios)) return;
 
@@ -174,24 +174,24 @@ function __onEvent(self, event) {
 
     switch (step) {
         case lxGames.OfferDialog.STEP_OFFER:
-            __stepOffer(self, data, key, scenario, initiator);
+            _stepOffer(self, data, key, scenario, initiator);
             break;
 
         case lxGames.OfferDialog.STEP_DECLINE:
-            __stepDecline(self, key);
+            _stepDecline(self, key);
             break;
 
         case lxGames.OfferDialog.STEP_CONFIRM:
-            __stepConfirm(self, data, key, scenario);
+            _stepConfirm(self, data, key, scenario);
             break;
 
         case lxGames.OfferDialog.STEP_FINAL:
-            __stepFinal(self, key);
+            _stepFinal(self, key);
             break;
     }
 }
 
-function __stepOffer(self, data, key, scenarioName, initiator) {
+function _stepOffer(self, data, key, scenarioName, initiator) {
     const request = new lxGames.offerDialog.Request(self, {
         name: scenarioName,
         data: data,
@@ -204,7 +204,7 @@ function __stepOffer(self, data, key, scenarioName, initiator) {
     const scenario = self.scenarios[scenarioName];
     let message = scenario.offerMessage(request);
 
-    __getConfirmPopup(self).open(message)
+    _getConfirmPopup(self).open(message)
         .confirm(()=>{
             data.__offer__ = {
                 scenario: scenarioName,
@@ -234,18 +234,18 @@ function __stepOffer(self, data, key, scenarioName, initiator) {
         });
 }
 
-function __stepDecline(self, key) {
+function _stepDecline(self, key) {
     if (!(key in self.requests)) return;
     delete self.requests[key];
-    __getConfirmPopup(self).close();
-    __getWaitingPopup(self).close();
-    __getDeclinePopup(self).open(lx.i18n(declined), {ok: lx.i18n(ok)});
+    _getConfirmPopup(self).close();
+    _getWaitingPopup(self).close();
+    _getDeclinePopup(self).open(lx.i18n(declined), {ok: lx.i18n(ok)});
 }
 
-function __stepConfirm(self, data, key, scenarioName) {
+function _stepConfirm(self, data, key, scenarioName) {
     if (!(key in self.requests)) return;
-    __getWaitingPopup(self).close();
-    __getFinalPopup(self).open(lx.i18n(confirmTitle))
+    _getWaitingPopup(self).close();
+    _getFinalPopup(self).open(lx.i18n(confirmTitle))
         .confirm(()=>{
             const scenario = self.scenarios[scenarioName];
             scenario.onConfirm(self.requests[key]);
@@ -278,7 +278,7 @@ function __stepConfirm(self, data, key, scenarioName) {
         });
 }
 
-function __stepFinal(self, key) {
+function _stepFinal(self, key) {
     if (!(key in self.requests)) return;
     delete self.requests[key];
 }

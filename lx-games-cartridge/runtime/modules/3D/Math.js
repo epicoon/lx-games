@@ -49,55 +49,55 @@ class Math {
     }
 
     /**
-     * Векторы перпендикулярны, если их скалярное произведение равно 0
-     * */
+     * Vectors are perpendicular if their dot product is 0
+     */
     static normalVectors(v, w) {
-        var dot = v.dot(w);
+        let dot = v.dot(w);
         return (_Math.abs(dot) < lxGames.threed.PRECISION);
     }
 
     /**
-     * Векторы коллинеарны, если их векторное произведение - нулевой вектор
-     * */
+     * Vectors are collinear if their cross product is the zero vector
+     */
     static collinearVectors(v, w) {
-        var cross = new THREE.Vector3();
+        let cross = new THREE.Vector3();
         cross.crossVectors(v, w);
         return this.zeroVector(cross);
     }
 
     /**
-     * Три вектора копланарны, если любой их них перпендикулярен векторному произведению двух других
-     * */
+     * Three vectors are coplanar if any one of them is perpendicular to the cross product of the other two
+     */
     static coplanarVectors(v, w, y) {
-        var cross = new THREE.Vector3();
+        let cross = new THREE.Vector3();
         cross.crossVectors(v, w);
         return this.normalVectors(cross, y);
     }
 
     /**
-     * Копланарность 4х точек: на 3х строится плоскость и проверяется, что расстояние до неё от 4й точки нулевое
-     * */
+     * Coplanarity of 4 points: a plane is built from 3 of them and the 4th point's distance to it is checked to be zero
+     */
     static coplanarPoints(a, b, c, d) {
-        var plane = new THREE.Plane();
+        let plane = new THREE.Plane();
         plane.setFromCoplanarPoints(a, b, c);
-        var dist = plane.distanceToPoint( d );
+        let dist = plane.distanceToPoint( d );
         return (_Math.abs(dist) <= lxGames.threed.PRECISION);
     }
 
     static coplanarTriangles(tr1, tr2) {
-        var pl = new THREE.Plane(),
+        let pl = new THREE.Plane(),
             normal = this.normalByCoplanarPoints(tr2[0], tr2[1], tr2[2]);
         pl.setFromCoplanarPoints( tr1[0], tr1[1], tr1[2] );
         if (!this.collinearVectors(pl.normal, normal)) return false;
-        var dist = pl.distanceToPoint( tr2[0] );
+        let dist = pl.distanceToPoint( tr2[0] );
         return (_Math.abs(dist) <= lxGames.threed.PRECISION);
     }
 
     /**
-     * По 3м точкам вычисляет нормальный вектор к плоскости, задаваемой этими точками
-     * */
+     * From 3 points, computes the normal vector to the plane they define
+     */
     static normalByCoplanarPoints(p0, p1, p2) {
-        var v01 = new THREE.Vector3(),
+        let v01 = new THREE.Vector3(),
             v02 = new THREE.Vector3(),
             n = new THREE.Vector3();
         v01.subVectors( p0, p1 );
@@ -107,10 +107,10 @@ class Math {
     }
 
     /**
-     * По 3м точкам находит длины сторон задаваемого ими треугольника
-     * */
+     * From 3 points, finds the side lengths of the triangle they define
+     */
     static triangleSides( v0, v1, v2 ) {
-        var a = new THREE.Vector3(),
+        let a = new THREE.Vector3(),
             b = new THREE.Vector3(),
             c = new THREE.Vector3();
 
@@ -126,16 +126,16 @@ class Math {
     }
 
     /**
-     * Определяется пересекаются ли два копланарных треугольника
-     * Треугольники заданы массивами векторов-вершин
-     * */
+     * Determines whether two coplanar triangles intersect
+     * Triangles are given as arrays of vertex vectors
+     */
     static intersectCoplanarTriangles(tr1, tr2) {
         function project( tr, axis ) {
-            var min, max;
+            let min, max;
             min = axis.dot( tr[0] );
             max = min;
-            for (var i=1; i<3; i++) {
-                var d = axis.dot( tr[i] );
+            for (let i=1; i<3; i++) {
+                let d = axis.dot( tr[i] );
                 if (d < min) min = d;
                 if (d > max) max = d;
             }
@@ -143,22 +143,22 @@ class Math {
         }
 
         function checkAxis( tr1, tr2, axis ) {
-            var prj1 = project( tr1, axis );
-            var prj2 = project( tr2, axis );
+            let prj1 = project( tr1, axis ),
+                prj2 = project( tr2, axis );
             if (prj2[1] >= prj1[1]) return prj2[0] - prj1[1];
             else return prj1[0] - prj2[1];
         }
 
-        var n1 = this.normalByCoplanarPoints( tr1[0], tr1[1], tr1[2] ),
+        let n1 = this.normalByCoplanarPoints( tr1[0], tr1[1], tr1[2] ),
             pi = [0, 1, 2, 0],
             tr = [tr1, tr2];
-        for (var j=0; j<2; j++) for (var i=0; i<3; i++) {
-            var sub = new THREE.Vector3();
-            var axis = new THREE.Vector3();
+        for (let j=0; j<2; j++) for (let i=0; i<3; i++) {
+            let sub = new THREE.Vector3(),
+                axis = new THREE.Vector3();
             sub.subVectors( tr[j][ pi[i] ], tr[j][ pi[i+1] ] );
             axis.crossVectors( sub, n1 );
             axis.normalize();
-            var dist = checkAxis(tr1, tr2, axis);
+            let dist = checkAxis(tr1, tr2, axis);
             if (dist >= -lxGames.threed.PRECISION) return false;
         }
 

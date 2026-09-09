@@ -6,7 +6,7 @@ lx.import(lxGames.threed);
 class GeometryPrism extends THREE.Geometry {
     constructor(faces, vertices, height) {
         super();
-        const geom = __calc(faces, vertices, height);
+        const geom = _calc(faces, vertices, height);
         this.vertices = geom.vertices;
         this.faces = geom.faces;
         this.faceVertexUvs[0] = geom.uvs;
@@ -15,7 +15,7 @@ class GeometryPrism extends THREE.Geometry {
     }
 }
 
-function __calc(argFaces, argVertices, argHeight) {
+function _calc(argFaces, argVertices, argHeight) {
     let vertices = [],
         faces = [],
         uvs = [],
@@ -38,10 +38,10 @@ function __calc(argFaces, argVertices, argHeight) {
         // f.materialIndex = 0;
         faces.push(f);
 
-        //TODO сделать текстурирование
-        // Для верхи и низа определить экстремумы но X и Z
-        // Двумерный минимум будет соответствовать нулю растра, двумерный максимум - противоположная точка
-        // Опираясь на эти вычесленные размеры вычисляем смещения текстуры для каждой вершины
+        //TODO add texturing
+        // For the top and bottom, find the X and Z extremes
+        // The 2D minimum maps to the raster origin, the 2D maximum to the opposite corner
+        // From these computed sizes, derive the texture offset for each vertex
         // let iUvs = [];
         // uvs.push(iUvs);
     });
@@ -58,9 +58,9 @@ function __calc(argFaces, argVertices, argHeight) {
     });
 
     // The seam
-    //TODO сделать текстурирование
-    // Текстутрировать шов можно, например выделив 4 области и каждую рсссчитать, т.е. наложить на шов текстуру 4 раза
-    // Или предусмотреть доп.параметр для конструктора, который будет задавать количество областей текстурирования шва
+    //TODO add texturing
+    // The seam could be textured by splitting it into 4 regions and computing each, i.e. applying the texture to the seam 4 times
+    // Or add a constructor parameter setting the number of seam texturing regions
     for (let i = 0; i < vMidCount - 1; i++) {
         let f = new THREE.Face3(i + 1 + vMidCount, i + 1, i);
         // f.materialIndex = 3;

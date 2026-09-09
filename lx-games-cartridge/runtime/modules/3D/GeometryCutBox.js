@@ -6,7 +6,7 @@ lx.import(lxGames.threed);
 class GeometryCutBox extends THREE.Geometry {
     constructor(w, h, d, r, sectors) {
         super();
-        const geom = __calc(w, h, d, r, sectors);
+        const geom = _calc(w, h, d, r, sectors);
         this.vertices = geom.vertices;
         this.faces = geom.faces;
         this.faceVertexUvs[0] = geom.uvs;
@@ -15,7 +15,7 @@ class GeometryCutBox extends THREE.Geometry {
     }
 }
 
-function __calc(w, h, d, r, sectors) {
+function _calc(w, h, d, r, sectors) {
     sectors = sectors || lxGames.threed.SMOOTH;
     r = r || [0, 0, 0, 0];
     if (sectors % 2) sectors++;
@@ -66,7 +66,7 @@ function __calc(w, h, d, r, sectors) {
         }
 
         // Basic triangles
-        for (var i=0; i<amount-2; i++) {
+        for (let i=0; i<amount-2; i++) {
             if (h > 0) faces.push( new THREE.Face3(lastAmt, lastAmt+i+1, lastAmt+i+2) );
             else faces.push( new THREE.Face3(lastAmt, lastAmt+i+2, lastAmt+i+1) );
         }

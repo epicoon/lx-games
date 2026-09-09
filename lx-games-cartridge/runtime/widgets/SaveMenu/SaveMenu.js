@@ -82,7 +82,7 @@ class SaveMenu extends lx.Box {
 
     	content.filter.on('change', function(e) {
 
-    		//TODO фильтровать список игр
+    		//TODO filter the games list
     		console.log('Filter has changed', e.newValue);
     	});
 

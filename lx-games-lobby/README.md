@@ -1,6 +1,6 @@
 # lx-games-lobby
 
-> Actual version: `v0.1.0-alpha.1`. [Details](./CHANGE_LOG.md)
+> Actual version: `v0.1.0-alpha.2`. [Details](./CHANGE_LOG.md)
 
 ## Prepare
 

@@ -18,8 +18,7 @@ func NewMainCommand(_ ...cmd.ICommandOptions) cmd.ICommand {
 func (c *MainCommand) Exec() error {
 	app, err := pkgApp.NewApp()
 	if err != nil {
-		fmt.Printf("Can not create application: %v\n", err)
-		return nil
+		return fmt.Errorf("can not create application: %w", err)
 	}
 
 	app.Run()

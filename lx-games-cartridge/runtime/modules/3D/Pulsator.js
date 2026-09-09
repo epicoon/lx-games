@@ -1,8 +1,8 @@
 // @lx:module lxGames.threed.Pulsator;
 
-//TODO набросок, как идея. Скопирован из Замков Бургундии.
-// Чтобы цвета запоминал и восстанавливал
-// Чтобы конфигурировался
+//TODO draft, just an idea. Copied from cofb.
+// Should remember and restore colors
+// Should be configurable
 
 // @lx:namespace lxGames.threed;
 class Pulsator {
@@ -19,7 +19,7 @@ class Pulsator {
         };
 
         this.animator.whileCycle(function() {
-            var shift = this.shift(),
+            let shift = this.shift(),
                 k, blue;
             if ( this.extand ) {
                 k = 1 + this.k * shift;
@@ -31,13 +31,13 @@ class Pulsator {
 
             for (let i in this.meshes) {
                 let mesh = this.meshes[i];
-                for (var j in mesh.geometry.vertices) {
+                for (let j in mesh.geometry.vertices) {
                     mesh.geometry.vertices[j].copy( this.baseVectors[i][j] );
                     mesh.geometry.vertices[j].multiplyScalar(k);
                 }
                 mesh.geometry.verticesNeedUpdate = true;
 
-                // __setMeshColor(this.meshes[i], [1, 1, blue]);
+                // _setMeshColor(this.meshes[i], [1, 1, blue]);
             }
 
             if ( this.isCycleEnd() ) {
@@ -46,13 +46,13 @@ class Pulsator {
         });
 
         this.animator.off = function() {
-            for (var i in this.baseVectors) {
-                for (var j in this.baseVectors[i]) {
+            for (let i in this.baseVectors) {
+                for (let j in this.baseVectors[i]) {
                     this.meshes[i].geometry.vertices[j].copy( this.baseVectors[i][j] );
                 }
                 this.meshes[i].geometry.verticesNeedUpdate = true;
 
-                // __setMeshColor(this.meshes[i], [1, 1, 1]);
+                // _setMeshColor(this.meshes[i], [1, 1, 1]);
             }
 
             this.baseVectors = [];
@@ -82,10 +82,10 @@ class Pulsator {
     }
 }
 
-function __setMeshColor(mesh, color) {
+function _setMeshColor(mesh, color) {
     let materials = lx.isArray(mesh.material) ? mesh.material : [mesh.material];
 
-    //TODO нет поля color
+    //TODO no color field
 
     for (let  i = 0; i < materials.length; i++) {
         let mat = materials[i];

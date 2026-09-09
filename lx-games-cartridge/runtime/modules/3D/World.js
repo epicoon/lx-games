@@ -19,12 +19,12 @@ class World {
      */
     constructor(config) {
         this.spotLights = [];
-        // Массив объектов, за пересечением которых мир следит автоматически
+        // Objects the world tracks for intersections automatically
         this.forIntersect = [];
-        // Мир кэширует пересечения при смещении мыши
+        // The world caches intersections on mouse move
         this.intersectsCache = [];
 
-        var canvas = config.canvas,
+        let canvas = config.canvas,
             position = config.cameraPosition || { x:0, y:0, z:10000 },
             color = config.color !== undefined ? config.color : 0xffffff,
             lights = config.lights || [ 0xffffff, 0xaaaaaa, 0x777777 ];
@@ -53,7 +53,7 @@ class World {
         });
 
         this.scene = new THREE.Scene();
-        var cameraConstructor = config.camera
+        let cameraConstructor = config.camera
                 ? (lx.isArray(config.camera) ? config.camera[0] : config.camera)
                 : lxGames.threed.Camera,
             cameraConfig = config.cameraConfig || ((config.camera && lx.isArray(config.camera)) ? config.camera[1] : {});
@@ -102,12 +102,12 @@ class World {
      */
     newMesh(config) {
         config = config || {};
-        var mesh = new THREE.Mesh(config.geometry, config.material);
+        let mesh = new THREE.Mesh(config.geometry, config.material);
         if (config.parent) config.parent.add(mesh);
         else if (config.parent === undefined) this.scene.add( mesh );
         if (config.clickable && mesh.parent) this.forIntersect.push(mesh);
         if (config.position) {
-            var p = config.position;
+            let p = config.position;
             if (lx.isArray(p)) p = {
                 x: p[0],
                 y: p[1],
@@ -131,7 +131,7 @@ class World {
     }
 
     /**
-     * Помещает меш в родителя, может сделать его кликабельным
+     * Puts a mesh into a parent, optionally making it clickable
      */
     putIn(parent, mesh, clickable) {
         if (parent === undefined) this.scene.add(mesh);
@@ -145,14 +145,14 @@ class World {
         }
 
         if (config.material === undefined) {
-            var mc = {
+            let mc = {
                 side: THREE.DoubleSide
             };
             if (config.color) mc.color = config.color;
             config.material = new THREE.MeshBasicMaterial(mc);
         }
 
-        var plane = this.newMesh(config);
+        let plane = this.newMesh(config);
 
         if (config.axis == 'xz') plane.rotation.x = Math.PI * 0.5;
         else if (config.axis == 'yz') plane.rotation.y = Math.PI * 0.5;
@@ -161,34 +161,34 @@ class World {
     }
 
     /**
-     * Для отслеживания пересечений
+     * For intersection tracking
      */
-    __checkMousePosition(x, y) {
+    _checkMousePosition(x, y) {
         let rect = this.canvas.getGlobalRect();
         this.mouse.x = ((x - rect.left) / this.width) * 2 - 1;
         this.mouse.y = - ((y - rect.top) / this.height) * 2 + 1;
     }
 
     /**
-     * Универсальный метод для отслеживания пересечений
+     * Generic intersection-tracking method
      */
-    __findIntersects(x, y, arr) {
+    _findIntersects(x, y, arr) {
         if (!arr.length) return [];
 
-        this.__checkMousePosition(x, y);
-        var vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
+        this._checkMousePosition(x, y);
+        let vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
         vector.unproject( this.camera );
 
-        var position = this.camera.position;
-        var raycaster = new THREE.Raycaster( position, vector.sub( position ).normalize() );
+        let position = this.camera.position,
+            raycaster = new THREE.Raycaster( position, vector.sub( position ).normalize() );
         return raycaster.intersectObjects(arr);
     }
 
     /**
-     * Навешивается на смещение мыши над канвасом, для автоматического отслеживания пересечений объектов
+     * Bound to mouse movement over the canvas, for automatic object intersection tracking
      */
     static cacheIntersects(event) {
-        this.intersectsCache = this.__findIntersects(
+        this.intersectsCache = this._findIntersects(
             event.clientX,
             event.clientY,
             this.forIntersect
@@ -196,11 +196,11 @@ class World {
     }
 
     /**
-     * Если аргументы не передавать, будут возвращены пересечения с автоматически отслеживаемыми объектами
+     * With no arguments, returns intersections with the automatically tracked objects
      */
     intersects(x, y, arr) {
         if (arr === undefined) return this.intersectsCache;
-        return this.__findIntersects(x, y, arr);
+        return this._findIntersects(x, y, arr);
     }
 }
 

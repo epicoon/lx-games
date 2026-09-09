@@ -10,7 +10,7 @@ class WebSocketClient extends lx.socket.WebSocketClient {
 		if (!config.connectionEventListener)
 			config.connectionEventListener = lxGames.Tools.ConnectionEventListener;
 
-		var listener = lx.isString(config.connectionEventListener)
+		let listener = lx.isString(config.connectionEventListener)
 			? lx.createObject(config.connectionEventListener, [env])
 			: new config.connectionEventListener(env);
 
