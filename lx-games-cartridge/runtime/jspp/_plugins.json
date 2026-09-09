@@ -1,5 +1,9 @@
 [
   {
+    "path": "runtime/plugins/ootv",
+    "name": "OotvPlugin"
+  },
+  {
     "path": "runtime/plugins/seabattle",
     "name": "SeabattlePlugin"
   }

@@ -1,33 +1,43 @@
 # lx-games-cartridge
 
-> Actual version: `v0.1.0-alpha.1`. [Details](./CHANGE_LOG.md)
+> Actual version: `v0.1.0-alpha.2`. [Details](./CHANGE_LOG.md)
 
 ## Prepare
 
 ```
 cp runtime/.env.example runtime/.env
+cp runtime/config-local-example.yaml runtime/config-local.yaml
 ```
 
-Then edit it - needed whether you run locally or in Docker below.
+Then edit both - needed whether you run locally or in Docker below.
 `runtime/.env` overrides `runtime/config.yaml`'s `${VAR}` placeholders
 (ports, `WS_HOST`, `CARTRIDGE_SLUG`, `LOBBY_URL`,
 `CARTRIDGE_ADVERTISE_ADDR`); absent entirely, the defaults baked into
 `config.yaml` apply, including an empty `LobbyURL` (no lobby configured -
-this app is fully usable standalone either way).
+this app is fully usable standalone either way). `runtime/config-local.yaml`
+holds per-deployment overrides (WS limits, `jspp` mode); `config.yaml`'s
+`Local: config-local.yaml` merges it in, so the file must exist.
 
 ## Running locally
 
 ```
+go run . jspp:build-core      # once: builds runtime/web/build/core*.js (not in the repo)
 go run .
 ```
 
 ## Docker
 
 ```
-./build.sh                    # cross-compiles ./bin for linux/amd64
 cd runtime
 docker compose up -d --build
 ```
+
+Only Docker is needed on the host: the image is built in a build stage that has
+Go (it compiles the binary and generates the jspp core, `core.js`/`core-server.js`),
+and the final image carries just the results. `./runtime` is bind-mounted over
+`/app/runtime`, so the core built into the image is copied to
+`runtime/web/build` on every container start. The first build takes a couple of
+minutes (the Go image and the dependencies are downloaded).
 
 `docker-compose.yml` lives in the module root (the usual place), but the
 `docker compose` command still has to be run from `runtime/` - see `cd
@@ -75,6 +85,6 @@ The other direction: this app POSTs `{addr}` to `<LobbyURL>/cartridge/announce`
 once at startup (see `app/cartridge_setup.go`) - plain HTTP, not a
 WS-request.
 
-`/seabattle` is a separate, unrelated route - a `jspp` plugin serving the
-actual game's browser UI, nothing to do with the lobby↔cartridge protocol
-above.
+`/seabattle` and `/ootv` are separate, unrelated routes - each a `jspp`
+plugin serving that game's browser UI directly (`/ootv` is currently
+offline-only), nothing to do with the lobby↔cartridge protocol above.

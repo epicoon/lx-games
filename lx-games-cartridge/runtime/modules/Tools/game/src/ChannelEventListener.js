@@ -22,12 +22,12 @@ class ChannelEventListener extends lx.socket.EventListener {
 		lx.tostError(event.getData().message);
 	}
 
-	onNewGamer(event) {__onChangeGamersList(this, event.getData())}
-	onGamerReconnected(event) {__onGamerReconnected(this, event.getData())}
-	onObserverConnected(event) {__onObserverConnected(this, event.getData())}
-	onGameStuffed(event) {__onGameStuffed(this, event.getData())}
-	onGamePrepared(event) {__onGamePrepared(this, event.getData())}
-	onGameLoaded(event) {__onConditionReceived(this, event.getData().gameData)}
+	onNewGamer(event) {_onChangeGamersList(this, event.getData())}
+	onGamerReconnected(event) {_onGamerReconnected(this, event.getData())}
+	onObserverConnected(event) {_onObserverConnected(this, event.getData())}
+	onGameStuffed(event) {_onGameStuffed(this, event.getData())}
+	onGamePrepared(event) {_onGamePrepared(this, event.getData())}
+	onGameLoaded(event) {_onConditionReceived(this, event.getData().gameData)}
 
 	onGameActivated() {
 		this.getGame()._conditionStatus = lxGames.Tools.CONDITION_STATUS_ACTIVE;
@@ -43,7 +43,7 @@ class ChannelEventListener extends lx.socket.EventListener {
 	}
 
 	onAskForRevenge(event) {
-		__onRevenge(this, event.getData());
+		_onRevenge(this, event.getData());
 	}
 
 	onRevengeVote(event) {
@@ -63,7 +63,7 @@ class ChannelEventListener extends lx.socket.EventListener {
  *
  * @trigger ENV_gameStuffed
  */
-function __onGameStuffed(self, data) {
+function _onGameStuffed(self, data) {
 	const env = self.getEnvironment();
 	env.unlockScreen();
 	env.game.setStuffed(true);
@@ -79,7 +79,7 @@ function __onGameStuffed(self, data) {
  *
  * @trigger ENV_gamePrepared
  */
-function __onGamePrepared(self, data) {
+function _onGamePrepared(self, data) {
 	if (data.roleAroundGame) {
 		const env = self.getEnvironment();
 		env.game.getLocalGamer().setType(data.roleAroundGame);
@@ -96,7 +96,7 @@ function __onGamePrepared(self, data) {
  *
  * @trigger ENV_changeGamersList
  */
-function __onChangeGamersList(self, list) {
+function _onChangeGamersList(self, list) {
 	const game = self.getGame();
 	for (let i=0; i<list.len; i++) {
 		let pare = list[i];
@@ -122,7 +122,7 @@ function __onChangeGamersList(self, list) {
  * @trigger ENV_gameOver
  * @trigger ENV_revengeRequested
  */
-function __onGamerReconnected(self, data) {
+function _onGamerReconnected(self, data) {
 	const env = self.getEnvironment(),
 		mate = env.getSocket().getChannelMate(data.reconnectionData.newConnectionId);
 	if (!mate.isLocal()) {
@@ -139,9 +139,9 @@ function __onGamerReconnected(self, data) {
 	if (env.game.isStuffed())
 		env.unlockScreen();
 
-	__onChangeGamersList(self, data.gamersData);
+	_onChangeGamersList(self, data.gamersData);
 	self.getPlugin().trigger('ENV_gamerReconnected', data.gameData);
-	__onConditionReceived(self, data.gameData);
+	_onConditionReceived(self, data.gameData);
 }
 
 /**
@@ -161,7 +161,7 @@ function __onGamerReconnected(self, data) {
  * @trigger ENV_gameOver
  * @trigger ENV_revengeRequested
  */
-function __onObserverConnected(self, data) {
+function _onObserverConnected(self, data) {
 	const env = self.getEnvironment(),
 		mate = env.getSocket().getChannelMate(data.observerId);
 	if (mate.isLocal()) {
@@ -169,8 +169,8 @@ function __onObserverConnected(self, data) {
 		if (env.game.isStuffed())
 			env.unlockScreen();
 
-		__onChangeGamersList(self, data.gamersData);
-		__onConditionReceived(self, data.gameData);
+		_onChangeGamersList(self, data.gamersData);
+		_onConditionReceived(self, data.gameData);
 	}
 
 	self.getPlugin().trigger('ENV_observerConnected', data.gameData);
@@ -186,12 +186,12 @@ function __onObserverConnected(self, data) {
  * @trigger ENV_gameOver
  * @trigger ENV_revengeRequested
  */
-function __onConditionReceived(self, condition) {
+function _onConditionReceived(self, condition) {
 	if (condition === null) return;
 
 	switch (condition.conditionStatus) {
 		case lxGames.Tools.CONDITION_STATUS_PREPARED:
-			__onGamePrepared(self, condition);
+			_onGamePrepared(self, condition);
 			break;
 		case lxGames.Tools.CONDITION_STATUS_ACTIVE:
 			self.getGame()._conditionStatus = lxGames.Tools.CONDITION_STATUS_ACTIVE;
@@ -203,7 +203,7 @@ function __onConditionReceived(self, condition) {
 			break;
 		case lxGames.Tools.CONDITION_STATUS_REVENGE:
 			delete condition.conditionStatus;
-			__onRevenge(self, condition);
+			_onRevenge(self, condition);
 			break;
 	}
 }
@@ -215,6 +215,6 @@ function __onConditionReceived(self, condition) {
  *
  * @trigger ENV_revengeRequested
  */
-function __onRevenge(self, revengeData) {
+function _onRevenge(self, revengeData) {
 	self.getPlugin().trigger('ENV_revengeRequested', revengeData);
 }

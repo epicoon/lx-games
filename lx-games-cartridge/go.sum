@@ -4,10 +4,10 @@ github.com/dlclark/regexp2 v1.11.5 h1:Q/sSnsKerHeCkc/jSTNq1oCm7KiVgUMZRDUoRu0JQZ
 github.com/dlclark/regexp2 v1.11.5/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/dop251/goja v0.0.0-20250630131328-58d95d85e994 h1:aQYWswi+hRL2zJqGacdCZx32XjKYV8ApXFGntw79XAM=
 github.com/dop251/goja v0.0.0-20250630131328-58d95d85e994/go.mod h1:MxLav0peU43GgvwVgNbLAj1s/bSGboKkhuULvq/7hx4=
-github.com/epicoon/lxgo/cmd v0.1.0-alpha.9 h1:BypApXZnGN6xVrVLsOwMT0P/Wyy6Le5ZaVhcA5D4ic4=
-github.com/epicoon/lxgo/cmd v0.1.0-alpha.9/go.mod h1:v8INL7t6smMlUNXQbGA/fYgWg+WVr7629LJTLglpXEk=
-github.com/epicoon/lxgo/jspp v0.1.0-alpha.34 h1:Arq+V1R5Uzc0t3UZMlRbe3nSFCTHKvS0LhyBQD1smHg=
-github.com/epicoon/lxgo/jspp v0.1.0-alpha.34/go.mod h1:DCBeCCvLauN9A9HnD829CbEs0U9ljOGfssAeafhWQXI=
+github.com/epicoon/lxgo/cmd v0.1.0-alpha.10 h1:9FpLkY7ef/etyr2gBFKbMGCpi3fzd6ZWBtSbxSMSwQ0=
+github.com/epicoon/lxgo/cmd v0.1.0-alpha.10/go.mod h1:v8INL7t6smMlUNXQbGA/fYgWg+WVr7629LJTLglpXEk=
+github.com/epicoon/lxgo/jspp v0.1.0-alpha.38 h1:cWXY9yZEZV+9qXRBEeTnmy2jAvcB/6Dp6IyjOcPdNEo=
+github.com/epicoon/lxgo/jspp v0.1.0-alpha.38/go.mod h1:DCBeCCvLauN9A9HnD829CbEs0U9ljOGfssAeafhWQXI=
 github.com/epicoon/lxgo/kernel v0.1.0-alpha.31 h1:boKo3X1Joy2raKgo+AYiwneLrfPx+/8ZLRMEVqwYx8k=
 github.com/epicoon/lxgo/kernel v0.1.0-alpha.31/go.mod h1:Irc2rUejD6HEfzcUAVObUzt8kGv8dtYYi8wiH3ogqu8=
 github.com/epicoon/lxgo/ws v0.1.0-alpha.9 h1:KAczGiQipddzNW9xvpe/5tT2HAk6/ZiON7DFfc7tWSk=

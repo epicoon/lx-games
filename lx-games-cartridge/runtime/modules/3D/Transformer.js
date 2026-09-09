@@ -11,13 +11,13 @@ class Transformer {
     static stretch(mesh, stretch) {
         if (stretch.x !== undefined) stretch = [stretch.x, stretch.y, stretch.z];
 
-        var geom = mesh.geometry;
+        let geom = mesh.geometry;
 
-        // Определяем габариты геометрии
-        var min = new THREE.Vector3(),
+        // Determine the geometry bounds
+        let min = new THREE.Vector3(),
             max = new THREE.Vector3();
-        for (var i in geom.vertices) {
-            var v = geom.vertices[i];
+        for (let i in geom.vertices) {
+            let v = geom.vertices[i];
             if (v.x < min.x) min.x = v.x;
             if (v.y < min.y) min.y = v.y;
             if (v.z < min.z) min.z = v.z;
@@ -26,16 +26,16 @@ class Transformer {
             if (v.z > max.z) max.z = v.z;
         }
 
-        // Разбегание вершин
-        for (var i=0; i<3; i++) {
+        // Spread the vertices apart
+        for (let i=0; i<3; i++) {
             if (!stretch[i]) continue;
 
-            var axis = lxGames.threed.axisName[i],
+            let axis = lxGames.threed.axisName[i],
                 l0 = max[axis] - min[axis],
                 l1 = l0 + stretch[i],
                 k = l1 / l0;
 
-            for (var i in geom.vertices) {
+            for (let i in geom.vertices) {
                 geom.vertices[i][axis] *= k;
             }
         }

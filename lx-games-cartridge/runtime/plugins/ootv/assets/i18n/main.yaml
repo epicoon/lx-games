@@ -1,0 +1,333 @@
+en-EN:
+  Outposts_of_the_Void: Outposts of the Void
+
+  gamer.raccoon: Raccoon #yellow
+  gamer.hamster: Hamster #red
+  gamer.beaver: Beaver #green
+  gamer.hadgehog: Hadgehog #blue
+
+  game.rules: "${^rules.en.md}"
+
+  root.newGameHint: Start a new game
+  root.pointsTable: Score table
+  root.rules: Rules
+  root.endTurn: End turn
+  root.points: Points
+  root.chat: Chat
+  main.move: The turn of player ${gamer}
+  main.gameOverQ: Game over. Do you want to view the score table?
+  main.gameOver: Game over
+  common.DropChipConfirm: Are you sure you want to drop this chip from the game?
+  newGameMenu.but: New game
+  newGameMenu.save: Save game
+  newGameMenu.revenge: Revenge
+  newGameMenu.gamers: Players
+  newGameMenu.seqTitleHint: Click to determine turn order
+  newGameMenu.seqHint: Turn order
+  newGameMenu.aiHint: The computer will act for the player
+  newGameMenu.activeHint: Participation in the game
+  newGameMenu.board: Player`s board
+  newGameMenu.choseBoard: Chose the board
+  newGameMenu.ok: Ok
+  newGameMenu.start: Start
+  newGameMenu.close: Close
+  newGameMenu.ready: Ready
+  newGameMenu.readyCount: "Ready gamers count: ${count}"
+  newGameMenu.commandTip: You can choose the starting position of your first command station
+  newGameMenu.confirm: Are you sure you want to start a new game? The current one will be reset
+
+  # Drones
+  drone.title: Drones
+  drone.service: Service Drones
+  drone.scout: Scout Drones
+  drone.cargo: Cargo Drones
+  drone.support: Support Drones
+
+  # Common
+  floatHint.0: "<b>Data Storage:</b> change the dice value by +1 or -1 at any time during your turn. Important: 6 + 1 will give 1, 1 - 1 will give 6"
+  floatHint.1: "<b>Energy Credit:</b> you can buy a token from the central storage for two energy credits"
+  floatHint.2: "<b>Player token:</b> shows the current number of earned points"
+  floatHint.3: "<b>Player token:</b> shows the order in which players take turns during a round - the farther to the right (or higher), the earlier"
+  floatHint.4: "<b>Shared dice:</b> at the beginning of the round determines which numbered storage the minerals will be sent to"
+  floatHint.5: "<b>Player dice:</b> use it to take tokens from the common field, add tokens to your building zone, split minerals, or exchange the dice for two Data Storage units"
+  floatHint.6: "<b>Stage minerals:</b> will be revealed in their stage"
+  floatHint.7: "<b>Turn minerals:</b> will be determined by the dice (sent to the numbered storage) at the beginning of their turn"
+  floatHint.8: "<b>Storage minerals:</b> can be taken away by a player when adding the mining probe to their building zone"
+  floatHint.9: "<b>Player minerals:</b> can be split, each will give --?-- victory points. A split group of minerals will give an energy credit"
+  floatHint.10: "<b>Split minerals:</b> can only score points if the corresponding technology is present"
+  floatHint.11: "<b>Mining Probe:</b> allows you to take minerals from any storage to your board and move your token to the right on the turn order track"
+  floatHint.12: "<b>Drones:</b> give --?-- victory points. If you have drones of the same type in the cluster, they will earn points again"
+  floatHint.13: "<b>Command Station:</b> gives an immediate additional action"
+  floatHint.14: "<b>Solar Panels:</b> at the end of each phase it gives an energy credit"
+  # Modules
+  floatHint.15: "<b>Drone Manufacturing Plant:</b> allows you to immediately take a mining probe or drone from any numbered storage"
+  floatHint.16: "<b>Research Laboratory:</b> allows you to immediately take solar panels, a command station, or technology from any numbered storage"
+  floatHint.17: "<b>Supercomputer:</b> provides four Data Storage units"
+  floatHint.18: "<b>Assembly Module:</b> allows you to immediately take a module from any numbered storage"
+  floatHint.19: "<b>Tokamak:</b> provides two energy credits"
+  floatHint.20: "<b>Roboport:</b> allows the player to add any hexagonal token from their board to their building zone"
+  floatHint.21: "<b>Matter Splitter:</b> allows you to immediately split any type of minerals"
+  floatHint.22: "<b>Telescope:</b> gives 4 victory points"
+  # Bonus
+  floatHint.23: "<b>Gold Medal:</b> to receive a bonus, fill all cells of the corresponding color in your building zone first"
+  floatHint.24: "<b>Silver Medal:</b> a bonus for filling all cells of the corresponding color in your building zone second"
+  # Technology
+  floatHint.25: "<b>Technology:</b> allows you to ignore the rule that there cannot be more than 1 module of the same type in one cluster"
+  floatHint.26: "<b>Technology:</b> at the end of a phase, each solar panel provides an additional Data Storage unit in addition to an energy credit"
+  floatHint.27: "<b>Technology:</b> splitting minerals gives not one, but two energy credits"
+  floatHint.28: "<b>Technology:</b> splitting minerals provides an additional Data Storage unit in addition to an energy credit"
+  floatHint.29: "<b>Technology:</b> when adding a mining probe to your building zone, you can take minerals from two ADJACENT numbered storages"
+  floatHint.30: "<b>Technology:</b> allows you to buy tokens from the numbered storages for energy credits"
+  floatHint.31: "<b>Technology:</b> when adding a drone token to your building zone, it gives 1 additional victory point for each drone token of the same type in the cluster"
+  floatHint.32: "<b>Technology:</b> allows you to change the dice value by +2 or -2 by spending a Data Storage unit"
+  floatHint.33: "<b>Technology:</b> when adding a module token to your building zone, the dice value is considered +1 or -1 as if a Data Storage unit had been spent"
+  floatHint.34: "<b>Technology:</b> when adding a mining probe or drones token to your building zone, the dice value is considered +1 or -1 as if a Data Storage unit had been spent"
+  floatHint.35: "<b>Technology:</b> when adding solar panels, technology, or a command station token to your building zone, the dice value is considered +1 or -1 as if a Data Storage unit had been spent"
+  floatHint.36: "<b>Technology:</b> when taking a token from a numbered storage, the dice value is considered +1 or -1 as if a Data Storage unit had been spent"
+  floatHint.37: "<b>Technology:</b> allows you to exchange the dice for an energy credit (in addition to two Data Storage units)"
+  floatHint.38: "<b>Technology:</b> allows you to exchange the dice for four Data Storage units"
+  floatHint.39: "<b>Technology:</b> at the end of the game, it will give 3 victory points for each type of split minerals"
+  floatHint.40: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built matter splitter"
+  floatHint.41: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built telescope"
+  floatHint.42: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built assembly module"
+  floatHint.43: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built research laboratory"
+  floatHint.44: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built drone manufacturing plant"
+  floatHint.45: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built supercomputer"
+  floatHint.46: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built tokamak"
+  floatHint.47: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each built roboport"
+  floatHint.48: "<b>Technology:</b> at the end of the game, it will give 4 victory points for each type of placed drone"
+  floatHint.49: "<b>Technology:</b> at the end of the game, it will give 1 victory point for each split minerals token"
+  floatHint.50: "<b>Technology:</b> at the end of the game, it will give 2 victory points for each bonus token"
+
+  scoreTable.service: service drones
+  scoreTable.scout: scout drones
+  scoreTable.cargo: cargo drones
+  scoreTable.support: support drones
+  scoreTable.drones: "Placed drones: ${drone}, ${count} pcs"
+  scoreTable.minerals: "Split minerals: ${count} pcs"
+  scoreTable.telescope: Telescope placed
+  scoreTable.fill: Cluster filled with ${count} cells
+  scoreTable.fillBonus: Phase bonus (${count}) for filling the cluster
+  scoreTable.dataStorage: "Remaining Data Storage units: ${count}"
+  scoreTable.credit: Earned energy credits
+  scoreTable.lostMinerals: Unsplit minerals
+  scoreTable.bonus: Bonus for filling a color completely
+  scoreTable.technology15: "Technology: 3 points for each type of split minerals"
+  scoreTable.technology16: "Technology: 4 points for each matter splitter"
+  scoreTable.technology17: "Technology: 4 points for each telescope"
+  scoreTable.technology18: "Technology: 4 points for each assembly module"
+  scoreTable.technology19: "Technology: 4 points for each research laboratory"
+  scoreTable.technology20: "Technology: 4 points for each drone manufacturing plant"
+  scoreTable.technology21: "Technology: 4 points for each supercomputer"
+  scoreTable.technology22: "Technology: 4 points for each tokamak"
+  scoreTable.technology23: "Technology: 4 points for each roboport"
+  scoreTable.technology24: "Technology: 4 points for each type of drone"
+  scoreTable.technology25: "Technology: 1 point for each split minerals token"
+  scoreTable.technology26: "Technology: 2 points for each bonus token"
+
+  dataStorageMenu.title: Exchange dice for two Data Storage units
+  dataStorageMenu.bonusDataStorage: two Data Storage units
+  dataStorageMenu.bonusCredit: energy credit
+  dataStorageMenu.bonus: "Your bonus: ${bonus} more"
+  dataStorageMenu.useDataStorage: Use a Data Storage unit
+  dataStorageMenu.dropDice: Exchange dice for two Data Storage units
+  dataStorageMenu.to: to
+
+  applyChip.fill: "Cluster filled: +${points}"
+  applyChip.drones: "Introduction of drones: +${points}"
+  applyChip.telescope: "Telescope construction: +4"
+  splitMinerals.points: "Minerals split: +${points}"
+
+  exception.boardNotFound: "Board tile with slug '${slug}' not found"
+  exception.gamerBoardNotFound: "Gamer board with index '${index}' not found"
+  exception.gamerNotFound: Gamer not found
+  exception.diceNotFound: Dice not found
+  exception.gamerNotActive: The gamer is not active now
+  exception.wrongDice: Wrong dice value
+  exception.wrongDiceModifier: Wrong dice modifier
+  exception.jokerChange: You can not change the joker dice
+  exception.tileNotFound: Wrong tile slug
+  exception.nothingToSplit: There are no minerals. Nothing to split
+  exception.wrongMinerals: You can not split the minerals by this dice value
+  exception.wrongAdv: You can not get the token by this dice value
+  exception.inactiveDice: The dice has already been used
+  exception.noDataStorages: You don`t have a Data Storage unit
+  exception.creditUsed: You`ve already bought a token this turn
+  exception.noCredit: Not enough energy credits
+  exception.wrongTileType: Wrong tile type
+  exception.emptyTile: The tile is empty
+  exception.noKeeper: You don`t have free tile to keep token
+  exception.noGamer: There are no active gamer
+  exception.hasActions: You still have an active dice, you have to use it before end the turn
+  exception.wrongGroup: The tile group is unsuitable for the chip
+  exception.sameModule: You can not install the second module in the same cluster
+  exception.emptyAdjacents: You can apply chips only in the neighborhood with already laid out
+  exception.gamerMove: Your token can not move anymore
+  exception.wrongGamerStatus: Gamer status is unsuitable
+
+
+ru-RU:
+  Outposts_of_the_Void: Аванпосты Пустоты
+
+  game.rules: "${^rules.ru.md}"
+
+  gamer.raccoon: Космоенот
+  gamer.hamster: Космохомяк
+  gamer.beaver: Космобобёр
+  gamer.hadgehog: Космоёж
+  root.newGameHint: Начните новую игру
+  root.pointsTable: Таблица очков
+  root.rules: Правила
+  root.endTurn: Переход хода
+  root.points: Набранные очки
+  root.chat: Чат
+  main.move: Ходит игрок ${gamer}
+  main.gameOverQ: Игра окончена. Хотите посмотреть таблицу очков?
+  main.gameOver: Игра окончена
+  common.DropChipConfirm: Уверены, что хотите сбросить эту фишку из игры?
+  newGameMenu.but: Новая игра
+  newGameMenu.save: Сохранить игру
+  newGameMenu.revenge: Реванш
+  newGameMenu.gamers: Игроки
+  newGameMenu.seqTitleHint: Нажмите, чтобы определить очередность хода
+  newGameMenu.seqHint: Очередность хода
+  newGameMenu.aiHint: За игрока будет действовать компьютер
+  newGameMenu.activeHint: Участие в игре
+  newGameMenu.board: Планшет игрока
+  newGameMenu.choseBoard: Выберите планшет
+  newGameMenu.ok: Ок
+  newGameMenu.start: Начать
+  newGameMenu.close: Закрыть
+  newGameMenu.ready: Подтвердить
+  newGameMenu.readyCount: "Готово игроков: ${count}"
+  newGameMenu.commandTip: Вы можете выбрать начальное положение Вашей первой командной станции
+  newGameMenu.confirm: Вы уверены, что хотите начать новую игру? Текущая будет сброшена
+
+  # Drones
+  drone.title: Дроны
+  drone.service: Обслуживающие дроны
+  drone.scout: Дроны разведки
+  drone.cargo: Транспортные дроны
+  drone.support: Дроны поддержки
+
+  # Common
+  floatHint.0: "<b>Накопитель данных:</b> в любой момент своего хода изменяйте результат кубика на +1 или -1. Важно: 6 + 1 даст 1, 1 - 1 даст 6"
+  floatHint.1: "<b>Энергокредит:</b> за два энергокредита можно купить жетон в центральном хранилище"
+  floatHint.2: "<b>Фишка игрока:</b> показывают текущее количество заработанных очков"
+  floatHint.3: "<b>Фишка игрока:</b> показывают в каком порядке игроки ходят в течение раунда - чем правее (или выше) фишка, тем раньше"
+  floatHint.4: "<b>Общий кубик:</b> в начале раунда разыгрывает в какое пронумерованное хранилище отправится минерал"
+  floatHint.5: "<b>Кубик игрока:</b> с его помощью берите жетоны с общего поля, добавляйте жетоны в свою зону строительства, расщепляйте минералы, или обменяйте кубик на два накопителя данных"
+  floatHint.6: "<b>Минералы стадии:</b> будут открыты в свою стадию"
+  floatHint.7: "<b>Минерал раунда:</b> будет разыгран кубиком (отправится в пронумерованное хранилище) в начале своего раунда"
+  floatHint.8: "<b>Минерал в хранилище:</b> может быть забран игроком при добавлении в зону строительства добывающего зонда"
+  floatHint.9: "<b>Минерал у игрока:</b> может быть расщеплён, каждый даст по --?-- победных очка. Расщеплённая группа минералов даст энергокредит"
+  floatHint.10: "<b>Минерал расщеплённый:</b> может дать очки только при наличии подходящих технологий"
+  floatHint.11: "<b>Добывающий зонд:</b> позволит забрать минералы из любого хранилища на ваш планшет и сместит вашу фишку вправо по треку очередности хода"
+  floatHint.12: "<b>Дроны:</b> дает --?-- победных очка. При наличии в кластере дронов этого же типа, они повторно приносят очки"
+  floatHint.13: "<b>Командная станция:</b> дает немедленное дополнительное действие"
+  floatHint.14: "<b>Солнечные панели:</b> в конце каждой фазы приносят энергокредит"
+  # Modules
+  floatHint.15: "<b>Дроновый завод:</b> позволит немедленно забрать добывающий зонд или дрон с любого пронумерованного хранилища"
+  floatHint.16: "<b>Исследовательская лаборатория:</b> позволит немедленно забрать солнечные панели, командную станцию или технологию с любого пронумерованного хранилища"
+  floatHint.17: "<b>Суперкомпьютер:</b> даст четыре накопителя данных"
+  floatHint.18: "<b>Сборочный модуль:</b> позволит немедленно забрать модуль с любого пронумерованного хранилища"
+  floatHint.19: "<b>Токамак:</b> даст два энергокредита"
+  floatHint.20: "<b>Робопорт:</b> позволит игроку добавить со своего планшета в зону строительства любой шестиугольный жетон"
+  floatHint.21: "<b>Расщепитель материи:</b> позволит немедленно расщепить один любой тип минералов"
+  floatHint.22: "<b>Телескоп:</b> даст 4 победных очка"
+  # Bonus
+  floatHint.23: "<b>Золотая медаль:</b> чтобы получить бонус, заполните в своей зоне строительства все ячейки соответствующего цвета первым"
+  floatHint.24: "<b>Серебряная медаль:</b> бонус тому, кто заполнит в своей зоне строительства все ячейки соответствующего цвета вторым"
+  # Technology
+  floatHint.25: "<b>Технология:</b> позволяет игнорировать правило о том, что в одном кластере не может быть больше 1 модуля одного типа"
+  floatHint.26: "<b>Технология:</b> в конце фазы каждая солнечная панель дает помимо энергокредита еще один накопитель данных"
+  floatHint.27: "<b>Технология:</b> расщепление минералов даст не один, а два энергокредита"
+  floatHint.28: "<b>Технология:</b> расщепление минералов даст помимо энергокредита еще один накопитель данных"
+  floatHint.29: "<b>Технология:</b> при добавлении в зону строительства добывающего зонда можно забрать минералы из двух СОСЕДНИХ пронумерованных хранилищ"
+  floatHint.30: "<b>Технология:</b> позволяет покупать за энергокредиты жетоны из пронумерованных хранилищ"
+  floatHint.31: "<b>Технология:</b> при добавлении в зону строительства жетона дрона дает на 1 победное очко больше за каждый жетон дрона этого типа в кластере"
+  floatHint.32: "<b>Технология:</b> позволяет изменять результат кубика на +2, -2 за потраченный накопитель данных"
+  floatHint.33: "<b>Технология:</b> при добавлении в зону строительства модуля, значение кубика считается +1, -1, как если бы был потрачен накопитель данных"
+  floatHint.34: "<b>Технология:</b> при добавлении в зону строительства добывающего зонда или дрона, значение кубика считается +1, -1, как если бы был потрачен накопитель данных"
+  floatHint.35: "<b>Технология:</b> при добавлении в зону строительства солнечных панелей, технологии или командной станции, значение кубика считается +1, -1, как если бы был потрачен накопитель данных"
+  floatHint.36: "<b>Технология:</b> при взятии жетона из пронумерованного хранилища, значение кубика считается +1, -1, как если бы был потрачен накопитель данных"
+  floatHint.37: "<b>Технология:</b> позволяет обменивать кубик на энергокредит (в дополнение к двум накопителям данных)"
+  floatHint.38: "<b>Технология:</b> позволяет обменивать кубик на четыре накопителя данных"
+  floatHint.39: "<b>Технология:</b> в конце игры принесет по 3 победных очка за каждый тип расщеплённых минералов"
+  floatHint.40: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный расщепитель материи"
+  floatHint.41: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный телескоп"
+  floatHint.42: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный сборочный модуль"
+  floatHint.43: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждую построенную исследовательскую лабораторию"
+  floatHint.44: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный дроновый завод"
+  floatHint.45: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный суперкомпьютер"
+  floatHint.46: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный токамак"
+  floatHint.47: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый построенный робопорт"
+  floatHint.48: "<b>Технология:</b> в конце игры принесет по 4 победных очка за каждый тип размещенных дронов"
+  floatHint.49: "<b>Технология:</b> в конце игры принесет 1 победное очко за каждый жетон расщеплённого минерала"
+  floatHint.50: "<b>Технология:</b> в конце игры принесет по 2 победных очка за каждый жетон бонуса"
+
+  scoreTable.service: обслуживающие дроны
+  scoreTable.scout: дроны разведки
+  scoreTable.cargo: транспортные дроны
+  scoreTable.support: дроны поддержки
+  scoreTable.drones: "Размещены дроны: ${drone}, ${count} шт"
+  scoreTable.minerals: "Расщеплены минералы: ${count} шт"
+  scoreTable.telescope: Размещён телескоп
+  scoreTable.fill: Заполнен кластер размером ${count} ячеек
+  scoreTable.fillBonus: Бонус фазы игры (${count}) за заполнение кластера
+  scoreTable.dataStorage: "Осталось накопителей данных: ${count}"
+  scoreTable.credit: Заработанные энергокредиты
+  scoreTable.lostMinerals: Нерасщеплённые минералы
+  scoreTable.bonus: Бонус за полное заполнение одного цвета
+  scoreTable.technology15: "Технология: 3 очка за каждый тип расщеплённых минералов"
+  scoreTable.technology16: "Технология: 4 очка за каждый расщепитель материи"
+  scoreTable.technology17: "Технология: 4 очка за каждый телескоп"
+  scoreTable.technology18: "Технология: 4 очка за каждый сборочный модуль"
+  scoreTable.technology19: "Технология: 4 очка за каждую исследовательскую лабораторию"
+  scoreTable.technology20: "Технология: 4 очка за каждый дроновый завод"
+  scoreTable.technology21: "Технология: 4 очка за каждый суперкомпьютер"
+  scoreTable.technology22: "Технология: 4 очка за каждый токамак"
+  scoreTable.technology23: "Технология: 4 очка за каждый робопорт"
+  scoreTable.technology24: "Технология: 4 очка за каждый тип дронов"
+  scoreTable.technology25: "Технология: 1 очко за каждый расщеплённый минерал"
+  scoreTable.technology26: "Технология: 2 очка за каждый жетон бонуса"
+
+  dataStorageMenu.title: Обменять кубик на два накопителя данных
+  dataStorageMenu.bonusDataStorage: два накопителя данных
+  dataStorageMenu.bonusCredit: энергокредит
+  dataStorageMenu.bonus: "Ваш бонус: еще ${bonus}"
+  dataStorageMenu.useDataStorage: Использовать накопитель данных
+  dataStorageMenu.dropDice: Обменять кубик на два накопителя данных
+  dataStorageMenu.to: до
+
+  applyChip.fill: "Заполнение кластера: +${points}"
+  applyChip.drones: "Введение дронов: +${points}"
+  applyChip.telescope: "Установка телескопа: +4"
+  splitMinerals.points: "Расщеплены минералы: +${points}"
+
+  exception.boardNotFound: "Ячейка планшета '${slug}' не найдена"
+  exception.gamerBoardNotFound: "Планшет игрока номер '${index}' не найден"
+  exception.gamerNotFound: Игрок не найден
+  exception.diceNotFound: Кубик не найден
+  exception.gamerNotActive: Игрок неактивен сейчас
+  exception.wrongDice: Неправильное значение кубика
+  exception.wrongDiceModifier: Неправильный модификатор кубика
+  exception.jokerChange: Вы не можете поменять кубик-джокер
+  exception.tileNotFound: Ячейка не найдена
+  exception.nothingToSplit: Нет минералов. Нечего расщеплять
+  exception.wrongMinerals: Вы не можете расщепить минералы по этому значению кубика
+  exception.wrongAdv: Вы не можете получить жетон по этому значению кубика
+  exception.inactiveDice: Кубик уже использован
+  exception.noDataStorages: У вас нет накопителя данных
+  exception.creditUsed: Вы уже купили жетон в этот ход
+  exception.noCredit: Недостаточно энергокредитов
+  exception.wrongTileType: Неправильный тип ячейкм
+  exception.emptyTile: Ячейка пуста
+  exception.noKeeper: У вас нет свободной ячейки для размещения жетона
+  exception.noGamer: Нет активных игроков
+  exception.hasActions: У вас все еще есть активный кубик, вы должны его использовать перед окончанием хода
+  exception.wrongGroup: Группа ячейки не подходит для фишки
+  exception.sameModule: Вы не можете установить второй модуль в том же кластере
+  exception.emptyAdjacents: Вы можете применять фишки только рядом с уже выложенными
+  exception.gamerMove: Ваша фишка больше не может двигаться
+  exception.wrongGamerStatus: Статус игрока не подходит

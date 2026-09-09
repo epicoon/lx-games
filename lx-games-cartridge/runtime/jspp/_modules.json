@@ -1,89 +1,5 @@
 [
   {
-    "name": "lxGames.threed.Camera",
-    "path": "runtime/modules/3D/Camera.js"
-  },
-  {
-    "name": "lxGames.threed.GeometryCutBox",
-    "path": "runtime/modules/3D/GeometryCutBox.js"
-  },
-  {
-    "name": "lxGames.threed.GeometryPrism",
-    "path": "runtime/modules/3D/GeometryPrism.js"
-  },
-  {
-    "name": "lxGames.threed.GeometryRing",
-    "path": "runtime/modules/3D/GeometryRing.js"
-  },
-  {
-    "name": "lxGames.threed.Math",
-    "path": "runtime/modules/3D/Math.js"
-  },
-  {
-    "name": "lxGames.threed.Pulsator",
-    "path": "runtime/modules/3D/Pulsator.js"
-  },
-  {
-    "name": "lxGames.threed",
-    "path": "runtime/modules/3D/Threed.js"
-  },
-  {
-    "name": "lxGames.threed.Transformer",
-    "path": "runtime/modules/3D/Transformer.js"
-  },
-  {
-    "name": "lxGames.threed.World",
-    "path": "runtime/modules/3D/World.js"
-  },
-  {
-    "name": "lxGames.Local",
-    "path": "runtime/modules/Local.js"
-  },
-  {
-    "name": "lxGames.OfferDialog",
-    "path": "runtime/modules/OfferDialog/OfferDialog.js",
-    "data": {
-      "i18n": "src/i18n.yaml"
-    }
-  },
-  {
-    "name": "lxGames.Online",
-    "path": "runtime/modules/Online.js"
-  },
-  {
-    "name": "lxGames.Tools",
-    "path": "runtime/modules/Tools/Tools.js",
-    "data": {
-      "i18n": "i18n.yaml"
-    }
-  },
-  {
-    "name": "lxGames.SaveMenu",
-    "path": "runtime/widgets/SaveMenu/SaveMenu.js",
-    "data": {
-      "i18n": "i18n.yaml"
-    }
-  },
-  {
-    "name": "lxGames.VotingMenu",
-    "path": "runtime/widgets/VotingMenu/VotingMenu.js",
-    "data": {
-      "i18n": "i18n.yaml"
-    }
-  },
-  {
-    "name": "lx.socket.WebSocketClient",
-    "path": "runtime/jspp/mods/lx/socket/WebSocketClient/WebSocketClient.js"
-  },
-  {
-    "name": "lx.socket.ChatBox",
-    "path": "runtime/jspp/mods/lx/socket/ChatBox/ChatBox.js",
-    "data": {
-      "i18n": "i18n.yaml",
-      "widget": "lx.MultiBox"
-    }
-  },
-  {
     "name": "lx.CodeEditor",
     "path": "runtime/jspp/mods/lx/CodeEditor/CodeEditor.js"
   },
@@ -356,6 +272,111 @@
     "path": "runtime/jspp/mods/lx/TreeBox.js",
     "data": {
       "widget": "lx.TreeBox"
+    }
+  },
+  {
+    "name": "lxGames.threed.Camera",
+    "path": "runtime/modules/3D/Camera.js"
+  },
+  {
+    "name": "lxGames.threed.GeometryCutBox",
+    "path": "runtime/modules/3D/GeometryCutBox.js"
+  },
+  {
+    "name": "lxGames.threed.GeometryPrism",
+    "path": "runtime/modules/3D/GeometryPrism.js"
+  },
+  {
+    "name": "lxGames.threed.GeometryRing",
+    "path": "runtime/modules/3D/GeometryRing.js"
+  },
+  {
+    "name": "lxGames.threed.Math",
+    "path": "runtime/modules/3D/Math.js"
+  },
+  {
+    "name": "lxGames.threed.Pulsator",
+    "path": "runtime/modules/3D/Pulsator.js"
+  },
+  {
+    "name": "lxGames.threed",
+    "path": "runtime/modules/3D/Threed.js"
+  },
+  {
+    "name": "lxGames.threed.Transformer",
+    "path": "runtime/modules/3D/Transformer.js"
+  },
+  {
+    "name": "lxGames.threed.World",
+    "path": "runtime/modules/3D/World.js"
+  },
+  {
+    "name": "lxGames.Local",
+    "path": "runtime/modules/Local.js"
+  },
+  {
+    "name": "lxGames.OfferDialog",
+    "path": "runtime/modules/OfferDialog/OfferDialog.js",
+    "data": {
+      "i18n": "src/i18n.yaml"
+    }
+  },
+  {
+    "name": "lxGames.Online",
+    "path": "runtime/modules/Online.js"
+  },
+  {
+    "name": "lxGames.Tools",
+    "path": "runtime/modules/Tools/Tools.js",
+    "data": {
+      "i18n": "i18n.yaml"
+    }
+  },
+  {
+    "name": "lxGames.ootv.LocalGame",
+    "path": "runtime/plugins/ootv/client/local/LocalGame.js",
+    "data": {
+      "i18n": "{plugin:OotvPlugin}/assets/i18n/main.yaml"
+    }
+  },
+  {
+    "name": "lxGames.ootv.OnlineGame",
+    "path": "runtime/plugins/ootv/client/online/OnlineGame.js",
+    "data": {
+      "i18n": "{plugin:OotvPlugin}/assets/i18n/main.yaml"
+    }
+  },
+  {
+    "name": "lxGames.ootv.BoardSchema",
+    "path": "runtime/plugins/ootv/widgets/BoardSchema.js",
+    "data": {
+      "widget": "lxGames.ootv.BoardSchema"
+    }
+  },
+  {
+    "name": "lxGames.SaveMenu",
+    "path": "runtime/widgets/SaveMenu/SaveMenu.js",
+    "data": {
+      "i18n": "i18n.yaml"
+    }
+  },
+  {
+    "name": "lxGames.VotingMenu",
+    "path": "runtime/widgets/VotingMenu/VotingMenu.js",
+    "data": {
+      "i18n": "i18n.yaml"
+    }
+  },
+  {
+    "name": "lx.socket.WebSocketClient",
+    "path": "runtime/jspp/mods/lx/socket/WebSocketClient/WebSocketClient.js"
+  },
+  {
+    "name": "lx.socket.ChatBox",
+    "path": "runtime/jspp/mods/lx/socket/ChatBox/ChatBox.js",
+    "data": {
+      "i18n": "i18n.yaml",
+      "widget": "lx.MultiBox"
     }
   }
 ]

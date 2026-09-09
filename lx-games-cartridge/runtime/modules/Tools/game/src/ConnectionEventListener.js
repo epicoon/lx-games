@@ -10,7 +10,7 @@ class ConnectionEventListener {
 
 	onConnected(event) {
 		if (this._environment.mode == 'dev') {
-		    console.log(__title(this, 'ON CONNECTED'));
+		    console.log(_title(this, 'ON CONNECTED'));
 		}
 
 		this._environment.getPlugin().trigger('ENV_socketConnected');
@@ -18,28 +18,28 @@ class ConnectionEventListener {
 
 	onMessage(message) {
 		if (this._environment.mode == 'dev') {
-		    console.log(__title(this, 'ON MESSAGE'));
+		    console.log(_title(this, 'ON MESSAGE'));
 		    console.log(message);
 		}
 	}
 
 	onClientJoin(event) {
 		if (this._environment.mode == 'dev') {
-		    console.log(__title(this, 'ON CLIENT JOIN'));
+		    console.log(_title(this, 'ON CLIENT JOIN'));
 			console.log(event.payload.mate);
 		}
 	}
 
 	onClientDisconnected(event) {
 		if (this._environment.mode == 'dev') {
-			console.log(__title(this, 'ON CLIENT DISCONNECTED'));
+			console.log(_title(this, 'ON CLIENT DISCONNECTED'));
 			console.log(event.payload.mate);
 		}
 	}
 
 	onClientReconnected(event) {
 		if (this._environment.mode == 'dev') {
-			console.log(__title(this, 'ON CLIENT RECONNECTED'));
+			console.log(_title(this, 'ON CLIENT RECONNECTED'));
 			console.log(event.payload.mate);
 		}
 
@@ -49,27 +49,27 @@ class ConnectionEventListener {
 
 	onClientLeave(event) {
 		if (this._environment.mode == 'dev') {
-		    console.log(__title(this, 'ON CLIENT LEAVE'));
+		    console.log(_title(this, 'ON CLIENT LEAVE'));
 			console.log(event.payload.mate);
 		}
 	}
 
 	onClose(event) {
 		if (this._environment.mode == 'dev') {
-		    console.log(__title(this, 'ON CLOSE'));
+		    console.log(_title(this, 'ON CLOSE'));
 			console.log(event);
 		}
 	}
 
 	onError(event) {
 		if (this._environment.mode == 'dev') {
-		    console.log(__title(this, 'ON ERROR'));
+		    console.log(_title(this, 'ON ERROR'));
 			console.log(event);
 		}
 	}
 }
 
-function __title(self, text) {
+function _title(self, text) {
 	return self._environment.name + '['
     	+ self._environment._connector._connectData.channelKey
     	+ '] ' + text;

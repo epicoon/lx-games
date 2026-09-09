@@ -40,6 +40,7 @@ func InitRoutes(app cnv.IApp) error {
 	}
 	pp.PluginManager().SetRoutes(jspp.PluginRoutesList{
 		"/seabattle": "SeabattlePlugin",
+		"/ootv":      "OotvPlugin",
 	})
 
 	return nil

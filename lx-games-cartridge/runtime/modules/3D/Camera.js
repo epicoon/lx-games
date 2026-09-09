@@ -72,7 +72,7 @@ class Camera extends THREE.PerspectiveCamera {
      * }}
      */
     setTransposer(config) {
-        __initTimer(this, config);
+        _initTimer(this, config);
     }
 
     /**
@@ -149,9 +149,9 @@ class Camera extends THREE.PerspectiveCamera {
         );
         direction.multiplyScalar(this.getSpeed());
 
-        let newPos = __calcNewPosition(this, direction, global);
-        if (__newPositionIsInLimits(this, newPos))
-            __applyNewPosition(this, newPos);
+        let newPos = _calcNewPosition(this, direction, global);
+        if (_newPositionIsInLimits(this, newPos))
+            _applyNewPosition(this, newPos);
     }
 
     onkeydown() {
@@ -208,7 +208,7 @@ class Camera extends THREE.PerspectiveCamera {
     onwheel(e) {
         if (this.locked) { this.moving = false; return; }
         let delta = (e.deltaY || e.detail || e.wheelDelta) * this.scrollSpeed;
-        // Костыль - т.к. вектор смещения переворачивается в зависимости от следования за мышью
+        // Workaround: the shift vector flips depending on whether the camera follows the mouse
         if (!this.followMouse) delta = -delta;
         this.shift([0, 0, delta]);
     }
@@ -222,7 +222,7 @@ class Camera extends THREE.PerspectiveCamera {
 /**
  * Calculate where you need to move the camera
  */
-function __calcNewPosition(self, direction, global) {
+function _calcNewPosition(self, direction, global) {
     let newPos = new THREE.Vector3();
     if (global) newPos.addVectors(self.position, direction);
     else {
@@ -247,7 +247,7 @@ function __calcNewPosition(self, direction, global) {
 /**
  * Apply new position
  */
-function __applyNewPosition(self, newPos) {
+function _applyNewPosition(self, newPos) {
     self.position.copy(newPos);
     if (self.watchTarget) self.lookAt(self.watchTarget);
 }
@@ -255,7 +255,7 @@ function __applyNewPosition(self, newPos) {
 /**
  * Checking for going beyond the established limits
  */
-function __newPositionIsInLimits(self, newPos) {
+function _newPositionIsInLimits(self, newPos) {
     if (self.limits.x) {
         if (newPos.x < self.limits.x[0]
             || newPos.x > self.limits.x[1]) return false;
@@ -271,7 +271,7 @@ function __newPositionIsInLimits(self, newPos) {
     return true;
 }
 
-function __initTimer(self, config) {
+function _initTimer(self, config) {
     self.transposer = new lx.Timer(config.duration);
     self.transposer._onFinish = config.onFinish || null;
     self.transposer.on = function( targetPosition, cameraToTargetVector = null ) {
