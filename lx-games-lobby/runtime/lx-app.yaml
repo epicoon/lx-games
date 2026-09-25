@@ -1,0 +1,11 @@
+params:
+  wsPort: '@config(Params.AppPortExternal)'
+
+components:
+  lang:
+    en-EN:
+      name: English
+      flag: lang/en.png
+    ru-RU:
+      name: Русский
+      flag: lang/ru.png

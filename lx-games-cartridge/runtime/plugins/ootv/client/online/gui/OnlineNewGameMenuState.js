@@ -88,7 +88,7 @@ class OnlineNewGameMenuState extends lxGames.ootv.NewGameMenuState {
             const gamerKey = gamerKeys[i++];
             gamersList.push({
                 colorId: gamerKey,
-                icon: gamerDatum[i].color + '.jpg',
+                icon: gamerDatum[i].avatar + '.jpg',
                 name: gamer.getName(),
                 id: gamer.getId(),
                 active: true
@@ -222,7 +222,7 @@ function _initColorMenu(node) {
         slot.add(lx.Box, {geom:true, fill:'black', opacity:0.7});
         let color = colors[i++];
         (slot.add(lx.Box, {margin:'10px', css:'ootv-gamer-color'}))
-            .picture(lx>>>Const.GAMERS[color].color + '.jpg')
+            .picture(lx>>>Const.GAMERS[color].avatar + '.jpg')
             .style('cursor', 'pointer');
         slot._color = color;
         slot.click(function () {
@@ -243,7 +243,7 @@ function _initColorMenu(node) {
             }
 
             colorMenu._model.colorId = this._color;
-            colorMenu._model.icon = lx>>>Const.GAMERS[this._color].color + '.jpg';
+            colorMenu._model.icon = lx>>>Const.GAMERS[this._color].avatar + '.jpg';
 
             colorMenu.close();
 

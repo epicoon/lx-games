@@ -1,13 +1,3 @@
-#gameOptions:
-#  title: Outposts_of_the_Void
-#  slug: ootv
-#  image: ootv.png
-#  minGamers: 2
-#  maxGamers: 4
-#  offline: true
-#  online: true
-#  channel: lexedo\myGames\ootv\server\OotvChannel
-
 name: OotvPlugin
 
 # --- Common ---
@@ -27,9 +17,6 @@ server:
   rootSnippet: snippets/_root.js
   snippets:
     - snippets
-
-# aliases:
-#   data: '{plugin:OotvPlugin}/data'
 
 # --- Client ---
 client:

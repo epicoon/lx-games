@@ -1,5 +1,8 @@
-Local: config-local.yaml
+Import: 
+  - config-local.yaml
+  # - config-resources-directly.yaml
 
+Host: ${APP_HOST:-localhost}
 Port: ${APP_PORT:-8092}
 
 # This app's own cartridge identity, reported to the lobby in every
@@ -7,6 +10,26 @@ Port: ${APP_PORT:-8092}
 # are several nodes of the same cartridge (for load-balancing), not
 # several different cartridges.
 CartridgeSlug: lxGames
+
+# Where this app looks for its own installed games - one subdirectory per
+# game, each with its own lx-game.yaml (nomenclature.Holder.Load scans it
+# at startup; see app/app.go's NewApp).
+GamesDir: runtime/plugins
+
+# Both optional - which of the found games actually get published, by
+# slug. GamesIgnore skips the listed slugs; GamesAllow, if set, is the
+# *only* slugs reported, everything else found is skipped. GamesIgnore
+# wins if a slug is listed in both. A slug that doesn't match any
+# actually-found game is simply never matched, not an error.
+# GamesIgnore: []
+# GamesAllow: []
+
+# The externally-reachable base URL this cartridge's own static assets
+# (images/css/js, see Components.JSPreprocessor.AssetLinksPath) are served
+# at - a CDN, or (the simplest case, and the default below) this same
+# app's own origin.
+Params:
+  StaticSrc: ${STATIC_SRC:-http://localhost:8092}
 
 # The lobby itself - used to announce this app's startup (once, and
 # re-broadcast as a deregister on graceful shutdown over the WS connection
@@ -18,18 +41,14 @@ CartridgeSlug: lxGames
 LobbyURL: ${LOBBY_URL:-http://localhost:8090}
 
 # The full addr announced to the lobby, when it needs to differ from
-# Components.WSServer.Host:Port below (see advertiseAddr in
+# this app's own "localhost:Port" (see advertiseAddr in
 # app/cartridge_setup.go) - e.g. behind Docker's port publishing, where
-# WSServer binds "0.0.0.0" (meaningless to a remote caller) on some
-# internal port that isn't necessarily the one actually reachable from
-# outside. Empty/absent means "use Host:Port as the announced address too"
-# - the case for a plain, directly-reachable run.
+# the internally-listening port isn't necessarily the one actually
+# reachable from outside. Empty/absent means "use localhost:Port as the
+# announced address too" - the case for a plain, directly-reachable run.
 CartridgeAdvertiseAddr: ${CARTRIDGE_ADVERTISE_ADDR:-}
 
 Components:
-  WSServer:
-    Host: ${WS_HOST:-localhost}
-    Port: ${WS_PORT:-8093}
   JSPreprocessor:
     CorePath: runtime/web/build/core.js
     MapsPath: runtime/jspp
@@ -39,3 +58,11 @@ Components:
       Inner: runtime/web/assets
       Outer: /web
     AppConfig: runtime/lx-app.yaml
+
+  # Lets this cartridge's own static asset routes (see InitRoutes'
+  # RegisterFileAssets/EnableFor calls) be fetched cross-origin from the
+  # lobby's page - needed only when AssetLinksPath.Outer is configured
+  # absolute so the browser actually loads this cartridge's assets directly.
+  # Cors:
+  #   Origins:
+  #     "http://localhost:8000": {}

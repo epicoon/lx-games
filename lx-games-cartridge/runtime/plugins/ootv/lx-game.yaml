@@ -1,0 +1,18 @@
+info:
+  slug: "ootv"
+  title: "Outposts of the Void"
+  version: "0.1.0"
+  description: "Send drones, build outposts and race for the most points on a shared orbital board. Dice decide what you can do - you decide how to use it."
+  genre: "Eurogame · space"
+  icon: ""
+  banner: ""
+  durationMinutes: "45–60"
+  minSlots: 2
+  maxSlots: 4
+  online: true
+  offline: true
+
+i18n:
+  current: en-EN
+  file: assets/i18n/game-info.yaml
+  keys: [title, description, genre]

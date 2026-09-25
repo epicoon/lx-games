@@ -7,21 +7,25 @@ class Constants {
 	GAMERS = {
 		yellow: {
 			name: lx.i18n(gamer.raccoon),
+			avatar: 'menuCharYellow',
 			color: 'charYellow',
 			chipColor: [1, 1, 0],
 		},
 		red: {
 			name: lx.i18n(gamer.hamster),
+			avatar: 'menuCharRed',
 			color: 'charRed',
 			chipColor: [1, 0.3, 0.3],
 		},
 		green: {
 			name: lx.i18n(gamer.beaver),
+			avatar: 'menuCharGreen',
 			color: 'charGreen',
 			chipColor: [0, 1, 0],
 		},
 		blue: {
 			name: lx.i18n(gamer.hadgehog),
+			avatar: 'menuCharBlue',
 			color: 'charBlue',
 			chipColor: [0.5, 0.5, 1],
 		},

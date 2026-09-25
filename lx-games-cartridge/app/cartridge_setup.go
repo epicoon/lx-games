@@ -61,7 +61,7 @@ func setupCartridge(app kernel.IApp) error {
 	}
 	announceURL := strings.TrimRight(lobbyURL, "/") + cartridgeAnnouncePath
 
-	addr := advertiseAddr(app, fmt.Sprintf("%s:%d", ws.Config().Host, ws.Config().Port))
+	addr := advertiseAddr(app, fmt.Sprintf("localhost:%d", app.Port()))
 	go announceWithRetry(app, announceURL, addr)
 
 	app.Events().Subscribe(kernel.EVENT_APP_BEFORE_FINAL, func(e kernel.IEvent) {
@@ -74,13 +74,10 @@ func setupCartridge(app kernel.IApp) error {
 
 // advertiseAddr is the addr this app announces to the lobby -
 // CartridgeAdvertiseAddr if configured (non-empty), otherwise defaultAddr
-// (Components.WSServer.Host:Port) unchanged. These need to differ whenever
-// defaultAddr isn't itself something a peer could dial back into: its host
-// is commonly a bind address like "0.0.0.0" (meaningless to a remote
-// caller, not an address at all), and even when the host is fine, its port
-// is the one this app listens on *internally* - behind a reverse proxy or
-// Docker's own port publishing, the externally reachable port can easily
-// be a different number entirely.
+// ("localhost:<this app's own Port>") unchanged. These need to differ
+// behind a reverse proxy or Docker's own port publishing, where the
+// externally reachable port can easily be a different number than the one
+// this app listens on *internally*.
 func advertiseAddr(app kernel.IApp, defaultAddr string) string {
 	if config.HasParam(app.Config(), "CartridgeAdvertiseAddr") {
 		a, err := config.GetParam[string](app.Config(), "CartridgeAdvertiseAddr")

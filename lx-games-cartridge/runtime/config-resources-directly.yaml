@@ -1,0 +1,8 @@
+  # To request resources directly
+Components:
+  JSPreprocessor:
+    AssetLinksPath:
+        Outer: ${STATIC_SRC}/web
+  Cors:
+    Origins:
+      "${LOBBY_URL}": {}

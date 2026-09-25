@@ -1,6 +1,87 @@
 en-EN:
-  hi: Hi
-
+  lobby.createRoom: Create room
+  lobby.playOffline: Play offline
+  lobby.games: Games
+  lobby.allGames: All games
+  lobby.tables: Tables
+  lobby.tablesFor: "Tables · ${game}"
+  lobby.live: live
+  lobby.filterAny: Any
+  lobby.filterWaiting: Open
+  lobby.filterFull: Full
+  lobby.filterPlaying: In progress
+  lobby.join: Join
+  lobby.watch: Watch
+  lobby.full: Full
+  lobby.signIn: Sign in
+  lobby.signOut: Sign out
+  lobby.players: Players
+  lobby.duration: Duration
+  lobby.min: min
+  lobby.noRooms: No open tables here yet
+  lobby.noRoomsHint: Be the first - open a table and others will see it instantly.
+  lobby.online: Online
+  lobby.offline: Offline
+  lobby.needAuth: Online play needs an account. Offline play does not.
+  lobby.newRoom: New table
+  lobby.newRoomSub: Others will see it in the lobby right away.
+  lobby.game: Game
+  lobby.tableName: Table name
+  lobby.seats: Seats
+  lobby.private: Private (join by invitation)
+  lobby.cancel: Cancel
+  lobby.create: Create
+  lobby.signInTitle: Sign in to play online
+  lobby.signInText: You will be taken to the lx-auth form and brought back here afterwards. Offline games stay available without an account.
+  lobby.continue: Continue
+  lobby.google: Continue with Google
+  lobby.comingSoon: soon
+  lobby.moreGames: More games coming
+  lobby.hostedBy: "Host: ${host}"
+  lobby.defaultRoomName: "${host}'s table"
+  lobby.tabLobby: Lobby
+  lobby.gamePaneNote: Loading...
 
 ru-RU:
-  hi: Привет
+  lobby.createRoom: Создать стол
+  lobby.playOffline: Играть офлайн
+  lobby.games: Игры
+  lobby.allGames: Все игры
+  lobby.tables: Столы
+  lobby.tablesFor: "Столы · ${game}"
+  lobby.live: онлайн
+  lobby.filterAny: Любые
+  lobby.filterWaiting: Открытые
+  lobby.filterFull: Заполнены
+  lobby.filterPlaying: Идёт игра
+  lobby.join: Войти
+  lobby.watch: Смотреть
+  lobby.full: Мест нет
+  lobby.signIn: Войти
+  lobby.signOut: Выйти
+  lobby.players: Игроки
+  lobby.duration: Партия
+  lobby.min: мин
+  lobby.noRooms: Открытых столов пока нет
+  lobby.noRoomsHint: Будьте первым - откройте стол, и остальные увидят его сразу.
+  lobby.online: Онлайн
+  lobby.offline: Офлайн
+  lobby.needAuth: Для игры онлайн нужен аккаунт. Для офлайна - не нужен.
+  lobby.newRoom: Новый стол
+  lobby.newRoomSub: Остальные увидят его в лобби сразу.
+  lobby.game: Игра
+  lobby.tableName: Название стола
+  lobby.seats: Мест
+  lobby.private: Закрытый (вход по приглашению)
+  lobby.cancel: Отмена
+  lobby.create: Создать
+  lobby.signInTitle: Войдите, чтобы играть онлайн
+  lobby.signInText: Вы перейдёте на форму lx-auth и после входа вернётесь сюда. Офлайн-игры доступны и без аккаунта.
+  lobby.continue: Продолжить
+  lobby.google: Войти через Google
+  lobby.comingSoon: скоро
+  lobby.moreGames: Скоро будут ещё игры
+  lobby.hostedBy: "Хозяин: ${host}"
+  lobby.defaultRoomName: "Стол игрока ${host}"
+  lobby.tabLobby: Лобби
+  lobby.gamePaneNote: Загрузка...

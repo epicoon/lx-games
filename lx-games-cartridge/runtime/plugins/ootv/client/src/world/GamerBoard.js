@@ -165,7 +165,7 @@ class GamerBoard extends lxGames.ootv.WorldObject {
 
 function _create(self) {
 	let t1 = self.getGame().world.getTexture( PLAN_MAP[self.gamer.colorId] ),
-		t2 = self.getGame().world.getTexture( lx>>>Const.GAMERS[ self.gamer.colorId ].color );
+		t2 = self.getGame().world.getTexture( self.gamer.getColorKey() );
 	let material = [
 		new THREE.MeshLambertMaterial({ map: t1 }),
 		new THREE.MeshLambertMaterial({ map: t2 }),

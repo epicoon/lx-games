@@ -1,15 +1,7 @@
 [
   {
-    "name": "lx.socket.WebSocketClient",
-    "path": "runtime/jspp/mods/lx/socket/WebSocketClient/WebSocketClient.js"
-  },
-  {
-    "name": "lx.socket.ChatBox",
-    "path": "runtime/jspp/mods/lx/socket/ChatBox/ChatBox.js",
-    "data": {
-      "i18n": "i18n.yaml",
-      "widget": "lx.MultiBox"
-    }
+    "name": "lxGames.lobby.MockData",
+    "path": "runtime/plugins/lobby/data/MockData.js"
   },
   {
     "name": "lx.CodeEditor",
@@ -284,6 +276,18 @@
     "path": "runtime/jspp/mods/lx/TreeBox.js",
     "data": {
       "widget": "lx.TreeBox"
+    }
+  },
+  {
+    "name": "lx.socket.WebSocketClient",
+    "path": "runtime/jspp/mods/lx/socket/WebSocketClient/WebSocketClient.js"
+  },
+  {
+    "name": "lx.socket.ChatBox",
+    "path": "runtime/jspp/mods/lx/socket/ChatBox/ChatBox.js",
+    "data": {
+      "i18n": "i18n.yaml",
+      "widget": "lx.MultiBox"
     }
   }
 ]

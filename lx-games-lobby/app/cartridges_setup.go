@@ -52,17 +52,9 @@ func readCartridges(cfg kernel.IDict) ([]string, error) {
 	if !config.HasParam(cfg, "Cartridges") {
 		return nil, nil
 	}
-	raw, err := config.GetParam[[]any](cfg, "Cartridges")
+	addrs, err := config.GetParam[[]string](cfg, "Cartridges")
 	if err != nil {
 		return nil, fmt.Errorf("Cartridges: %w", err)
-	}
-	addrs := make([]string, 0, len(raw))
-	for _, v := range raw {
-		s, err := cast.To[string](v)
-		if err != nil {
-			return nil, fmt.Errorf("Cartridges entry %v: %w", v, err)
-		}
-		addrs = append(addrs, s)
 	}
 	return addrs, nil
 }
@@ -82,12 +74,16 @@ func buildCartridgesRegistry(app kernel.IApp) (*cartridges.Registry, error) {
 		return nil, err
 	}
 
-	registry := cartridges.NewRegistry(cartridges.Dial, cartridges.Config{
+	registry, err := cartridges.NewRegistry(cartridges.Dial, cartridges.Config{
 		RequestTimeout: time.Duration(settings.RequestTimeoutMs) * time.Millisecond,
 		RetryInterval:  time.Duration(settings.RetryIntervalMs) * time.Millisecond,
 		MaxAttempts:    settings.MaxRetries,
 		OnLogError:     func(msg string) { app.LogError(msg, "Cartridges") },
 	}, addrs)
+	if err != nil {
+		return nil, err
+	}
+
 	return registry, nil
 }
 
@@ -105,7 +101,10 @@ func AddNewCartridges(app cnv.IApp) {
 	registry := app.CartridgesRegistry()
 	for _, addr := range addrs {
 		if _, known := registry.Status(addr); !known {
-			registry.AddCartridge(addr)
+			err := registry.AddCartridge(addr)
+			if err != nil {
+				app.LogError(fmt.Sprintf("can not add Cartridge '%s': %v", addr, err), "Cartridges")
+			}
 		}
 	}
 }

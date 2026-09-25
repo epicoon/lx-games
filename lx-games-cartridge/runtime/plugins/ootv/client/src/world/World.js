@@ -64,10 +64,22 @@ class World extends lxGames.threed.World {
 	}
 
 	getTexture(name) {
-		if (name in this.texturesList) return this.texturesList[name];
 		if (!name.match(/\./)) name += '.jpg';
+		if (name in this.texturesList) return this.texturesList[name];
 
-		let fileName = this.game.getPlugin().getImage(name),
+		// Loaded here via THREE's ImageLoader with crossOrigin set (needed
+		// for WebGL texture security) - a fetch mode ("cors") the browser
+		// caches separately from a plain, non-crossOrigin image load (CSS
+		// background-image, a plain <img>, etc - "no-cors") of the
+		// identical URL. If the same file was already fetched that other
+		// way first (e.g. BoardSchema's picture() board-schema preview),
+		// the browser refuses to also serve/fetch it in cors mode here -
+		// the load fails without the request even reaching the server.
+		// The query string below makes this a distinct URL with its own
+		// cache entry, unaffected by how any plain-image use of the same
+		// asset elsewhere was fetched.
+		let imagePath = this.game.getPlugin().getImage(name),
+			fileName = imagePath + (imagePath.indexOf('?') === -1 ? '?' : '&') + 'webgl',
 			texture = (new THREE.TextureLoader).load(fileName);
 		texture.minFilter = texture.magFilter = THREE.LinearFilter;
 		texture.anisotropy = 4;

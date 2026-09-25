@@ -5,6 +5,7 @@
   },
   {
     "path": "runtime/plugins/lobby",
-    "name": "LobbyPlugin"
+    "name": "LobbyPlugin",
+    "plugin": "lobby.LobbyPlugin"
   }
 ]

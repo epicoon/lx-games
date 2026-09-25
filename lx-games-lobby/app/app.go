@@ -7,6 +7,7 @@ import (
 	"github.com/epicoon/lx-games-lobby/cnv"
 	"github.com/epicoon/lxgo/kernel"
 	lxApp "github.com/epicoon/lxgo/kernel/app"
+	wsComp "github.com/epicoon/lxgo/ws/component"
 )
 
 /** @interface cnv.IApp */
@@ -27,6 +28,10 @@ func NewApp() (cnv.IApp, error) {
 		return nil, err
 	}
 
+	if err := setDI(app); err != nil {
+		return nil, err
+	}
+
 	registry, err := buildCartridgesRegistry(app)
 	if err != nil {
 		return nil, fmt.Errorf("can not build cartridges registry: %w", err)
@@ -38,11 +43,20 @@ func NewApp() (cnv.IApp, error) {
 	app.Events().Subscribe(kernel.EVENT_CONFIG_REFRESHED, func(e kernel.IEvent) {
 		AddNewCartridges(app)
 	})
+
+	ws, err := wsComp.AppComponent(app)
+	if err != nil {
+		return nil, fmt.Errorf("WSServer component required: %w", err)
+	}
+	go ws.Start()
 	app.Events().Subscribe(kernel.EVENT_APP_BEFORE_FINAL, func(e kernel.IEvent) {
 		registry.StopRetryScheduler()
+		ws.Stop()
 	})
 
-	InitRoutes(app)
+	if err := InitRoutes(app); err != nil {
+		return nil, fmt.Errorf("can not init routes: %w", err)
+	}
 
 	return app, nil
 }

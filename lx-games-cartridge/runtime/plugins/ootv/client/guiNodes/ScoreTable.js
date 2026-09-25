@@ -46,7 +46,7 @@ function _addGamerInfoBox(self, gamer) {
     let headerWrapper = new lx.Box({parent:mainBox, height:'50px'});
     new lx.Rect({parent:headerWrapper, geom:true, fill:'black', opacity:0.6});
     let header = new lx.Box({parent:headerWrapper, geom:true});
-    new lx.Box({parent:header, size:['30px', '30px'], picture:lx>>>Const.GAMERS[gamer.colorId].color + '.jpg'});
+    new lx.Box({parent:header, size:['30px', '30px'], picture:lx>>>Const.GAMERS[gamer.colorId].avatar + '.jpg'});
 
     let body = new lx.Box({parent:mainBox});
     body.overflow('auto');

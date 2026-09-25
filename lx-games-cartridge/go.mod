@@ -4,9 +4,11 @@ go 1.25.0
 
 require (
 	github.com/epicoon/lxgo/cmd v0.1.0-alpha.10
-	github.com/epicoon/lxgo/jspp v0.1.0-alpha.38
-	github.com/epicoon/lxgo/kernel v0.1.0-alpha.31
-	github.com/epicoon/lxgo/ws v0.1.0-alpha.9
+	github.com/epicoon/lxgo/cors v0.1.0-alpha.1
+	github.com/epicoon/lxgo/jspp v0.1.0-alpha.39
+	github.com/epicoon/lxgo/kernel v0.1.0-alpha.32
+	github.com/epicoon/lxgo/ws v0.1.0-alpha.11
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -19,5 +21,4 @@ require (
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/term v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

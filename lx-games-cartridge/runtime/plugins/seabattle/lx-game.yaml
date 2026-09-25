@@ -1,0 +1,13 @@
+info:
+  slug: "seabattle"
+  title: "Sea Battle"
+  version: "0.1.0"
+  description: "The timeless fleet duel for two. Place your ships, call the shots."
+  genre: "Classic · duel"
+  icon: ""
+  banner: ""
+  durationMinutes: "10–15"
+  minSlots: 2
+  maxSlots: 2
+  online: true
+  offline: false

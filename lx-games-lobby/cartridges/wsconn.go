@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/epicoon/lxgo/kernel/cast"
 	"github.com/epicoon/lxgo/ws"
 	wsComp "github.com/epicoon/lxgo/ws/component"
 )
@@ -15,7 +16,14 @@ const (
 	RouteNomenclature = "/nomenclature"
 	RouteActiveRooms  = "/rooms"
 	RoutePing         = "/ping"
+	RouteGame         = "/game"
 )
+
+// cartridgeWSPath is the path a cartridge's WS endpoint is mounted on -
+// every cartridge runs Components.WSServer with no Port configured, so it
+// shares its one HTTP port with WS (see component.WSServer.Start's doc
+// comment in lxgo-ws) at this fixed path.
+const cartridgeWSPath = "/ws"
 
 // Dial connects to the cartridge at addr, backed by lxgo-ws's outbound WS
 // client (component.Dial). The cartridge plays the server role for the
@@ -29,7 +37,7 @@ func Dial(addr string, requestTimeout time.Duration, onDeregister, onDropped fun
 			onDeregister()
 		}
 	}
-	rc, err := wsComp.Dial(addr, "/", onPush, onDropped)
+	rc, err := wsComp.Dial(addr, cartridgeWSPath, onPush, onDropped)
 	if err != nil {
 		return nil, fmt.Errorf("dial cartridge at %s: %w", addr, err)
 	}
@@ -54,15 +62,15 @@ func IsDeregister(msg any) bool {
 var _ Conn = (*wsConn)(nil)
 
 // wsConn is the real Conn - a thin adapter over ws.IClient, translating
-// Registry's FetchNomenclature/FetchActiveRooms/Ping calls into requests on
-// the routes the cartridge's own ws.Router answers.
+// Registry's FetchNomenclature/FetchActiveRooms/FetchGame/Ping calls into
+// requests on the routes the cartridge's own ws.Router answers.
 type wsConn struct {
 	rc             ws.IClient
 	requestTimeout time.Duration
 }
 
 func (c *wsConn) FetchNomenclature() (string, []Nomenclature, error) {
-	body, err := c.request(RouteNomenclature)
+	body, err := c.request(RouteNomenclature, nil)
 	if err != nil {
 		return "", nil, err
 	}
@@ -70,15 +78,35 @@ func (c *wsConn) FetchNomenclature() (string, []Nomenclature, error) {
 }
 
 func (c *wsConn) FetchActiveRooms() ([]Room, error) {
-	body, err := c.request(RouteActiveRooms)
+	body, err := c.request(RouteActiveRooms, nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeRooms(body)
 }
 
+func (c *wsConn) FetchGame(slug, lang string) (map[string]any, error) {
+	params := map[string]any{"slug": slug}
+	if lang != "" {
+		params["lang"] = lang
+	}
+	body, err := c.request(RouteGame, params)
+	if err != nil {
+		return nil, err
+	}
+	obj, err := asObject(body)
+	if err != nil {
+		return nil, err
+	}
+	plugin, ok := obj["plugin"].(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("expected an object \"plugin\" field, got %#v", obj["plugin"])
+	}
+	return plugin, nil
+}
+
 func (c *wsConn) Ping() error {
-	_, err := c.request(RoutePing)
+	_, err := c.request(RoutePing, nil)
 	return err
 }
 
@@ -86,12 +114,8 @@ func (c *wsConn) Close() error {
 	return c.rc.Close()
 }
 
-// request sends a request for route and returns its already-decoded body -
-// a >=400 response code is treated as an error here, since every route
-// this package calls answers either with the requested data or a failure,
-// never a body meant to be read alongside a failing code.
-func (c *wsConn) request(route string) (any, error) {
-	resp, err := c.rc.Request(route, nil, c.requestTimeout)
+func (c *wsConn) request(route string, params map[string]any) (any, error) {
+	resp, err := c.rc.Request(route, params, c.requestTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -101,21 +125,13 @@ func (c *wsConn) request(route string) (any, error) {
 	return resp.Body, nil
 }
 
-// decodeNomenclature/decodeRooms defensively pull fields out of the
-// map[string]any/[]any shape a Response's Body decodes into (JSON numbers
-// arrive as float64) - a malformed/missing field is left at its zero value
-// rather than failing the whole list.
-
-// decodeNomenclature reads {"slug": "...", "games": [...]} - unlike
-// RouteActiveRooms, the nomenclature response is an object rather than a
-// bare list, since the cartridge reports its own slug once per response
-// rather than once per game (see Conn.FetchNomenclature).
+// decodeNomenclature reads {"slug": "...", "games": [...]}
 func decodeNomenclature(body any) (string, []Nomenclature, error) {
 	obj, err := asObject(body)
 	if err != nil {
 		return "", nil, err
 	}
-	slug := stringField(obj, "slug")
+	slug, _ := obj["slug"].(string)
 
 	games, _ := obj["games"].([]any)
 	out := make([]Nomenclature, 0, len(games))
@@ -124,16 +140,11 @@ func decodeNomenclature(body any) (string, []Nomenclature, error) {
 		if !ok {
 			continue
 		}
-		out = append(out, Nomenclature{
-			Name:        stringField(m, "name"),
-			Slug:        stringField(m, "slug"),
-			Description: stringField(m, "description"),
-			Image:       stringField(m, "image"),
-			MinSlots:    intField(m, "minSlots"),
-			MaxSlots:    intField(m, "maxSlots"),
-			Online:      boolField(m, "online"),
-			Offline:     boolField(m, "offline"),
-		})
+		var n Nomenclature
+		if err := cast.MapToStruct(m, &n); err != nil {
+			continue
+		}
+		out = append(out, n)
 	}
 	return slug, out, nil
 }
@@ -149,10 +160,11 @@ func decodeRooms(body any) ([]Room, error) {
 		if !ok {
 			continue
 		}
-		out = append(out, Room{
-			InstanceID: stringField(m, "instanceId"),
-			Slug:       stringField(m, "slug"),
-		})
+		var r Room
+		if err := cast.MapToStruct(m, &r); err != nil {
+			continue
+		}
+		out = append(out, r)
 	}
 	return out, nil
 }
@@ -180,25 +192,4 @@ func asObject(body any) (map[string]any, error) {
 		return nil, fmt.Errorf("expected an object response body, got %T", body)
 	}
 	return obj, nil
-}
-
-func stringField(m map[string]any, key string) string {
-	s, _ := m[key].(string)
-	return s
-}
-
-func intField(m map[string]any, key string) int {
-	switch v := m[key].(type) {
-	case float64:
-		return int(v)
-	case int:
-		return v
-	default:
-		return 0
-	}
-}
-
-func boolField(m map[string]any, key string) bool {
-	b, _ := m[key].(bool)
-	return b
 }

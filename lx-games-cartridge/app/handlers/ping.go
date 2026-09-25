@@ -17,5 +17,9 @@ func NewPingHandler() kernel.IHttpResource {
 }
 
 func (h *PingHandler) Run() kernel.IHttpResponse {
-	return h.JsonResponse(kernel.JsonResponseConfig{Data: map[string]any{"ok": true}})
+	return h.JsonResponse(kernel.JsonResponseConfig{
+		Data: map[string]any{
+			"ok": true,
+		}},
+	)
 }

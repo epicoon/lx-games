@@ -6,83 +6,15 @@
 package cartridges
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/epicoon/lxgo/kernel/utils"
 )
-
-// State is one tracked cartridge's current connection state.
-type State int
-
-const (
-	// StateDead means the last contact attempt failed and nothing further
-	// is scheduled - only a fresh HTTP announce from that cartridge
-	// (Announce), or a manual push, revives it. Every cartridge starts here.
-	StateDead State = iota
-	// StatePendingRetry means the cartridge was Connected at some point, an
-	// interaction with it just failed, and a retry is scheduled.
-	StatePendingRetry
-	// StateConnected means there's a live connection and cached
-	// nomenclature data.
-	StateConnected
-	// StateCorrupted means the node connected fine at the transport level,
-	// but every game it reported conflicted with an already-registered
-	// node's data under the same key (see attemptConnect) - a
-	// version/config mismatch, not a connectivity problem. Terminal: unlike
-	// StateDead it's never picked up by the retry scheduler
-	// (retryDueCartridges only looks at StatePendingRetry) and Announce
-	// won't revive it either (see Announce, AddCartridge) - only a
-	// deliberate ForceConnect gives it another chance.
-	StateCorrupted
-)
-
-func (s State) String() string {
-	switch s {
-	case StateDead:
-		return "dead"
-	case StatePendingRetry:
-		return "pending-retry"
-	case StateConnected:
-		return "connected"
-	case StateCorrupted:
-		return "corrupted"
-	default:
-		return fmt.Sprintf("unknown(%d)", int(s))
-	}
-}
-
-// Nomenclature is one game type a cartridge reports.
-type Nomenclature struct {
-	Name        string
-	Slug        string
-	Version     string
-	Description string
-	Image       string
-	MinSlots    int
-	MaxSlots    int
-	Online      bool
-	Offline     bool
-}
-
-// Room is one active game instance a cartridge reports.
-type Room struct {
-	InstanceID string
-	Slug       string
-}
-
-// Conn is one live connection to a cartridge.
-type Conn interface {
-	// FetchNomenclature asks the cartridge for its own cartridge slug and
-	// its game-type list.
-	FetchNomenclature() (slug string, nomenclature []Nomenclature, err error)
-	// FetchActiveRooms asks the cartridge for its currently active game instances.
-	FetchActiveRooms() ([]Room, error)
-	// Ping is a cheap liveness check - a nil error means the connection is
-	// still usable.
-	Ping() error
-	// Close tears down the connection. Idempotent.
-	Close() error
-}
 
 // Dialer opens a Conn to a cartridge listening at addr ("host:port"),
 // waiting at most requestTimeout for the dial itself to complete - see Dial
@@ -109,38 +41,6 @@ type Config struct {
 	OnLogError func(msg string)
 }
 
-// entry is one tracked cartridge node's state - only ever touched under
-// Registry.mu.
-type entry struct {
-	addr string
-	// slug is the cartridge's own reported slug - see
-	// Conn.FetchNomenclature. Empty until the first successful connect;
-	// several entries can end up with the same slug (several nodes of the
-	// same cartridge, for load-balancing).
-	slug string
-	// nomenclature is the subset of Registry.nomenclature this node
-	// currently contributes to - shared *NomenclatureEntry pointers, not
-	// this node's own private copy (see addNomenclature/removeNomenclature).
-	// Empty whenever the entry isn't StateConnected.
-	nomenclature  []*NomenclatureEntry
-	state         State
-	conn          Conn
-	everConnected bool
-	connecting    bool
-	attempts      int
-	nextAttempt   time.Time
-}
-
-// Status is a point-in-time, safe-to-share snapshot of one cartridge
-// node's state.
-type Status struct {
-	Addr        string
-	State       State
-	Attempts    int
-	MaxAttempts int
-	NextAttempt time.Time
-}
-
 // Registry tracks every configured cartridge and the lobby's current
 // relationship to whatever's running there.
 type Registry struct {
@@ -148,8 +48,13 @@ type Registry struct {
 	config Config
 
 	mu sync.Mutex
-	// entries keyed by "host:port"
-	entries map[string]*entry
+
+	// cartridgeNodes keyed by random string
+	cartridgeNodes map[string]*cartridgeNode
+	// cartridgeNodesMap - map[cartridgeNodeAddr]cartridgeNodeKey, where
+	// cartridgeNodeAddr - "host:port"
+	cartridgeNodesMap map[string]string
+
 	// nomenclature is the registry-wide index of every distinct game currently
 	// available, keyed by "CartridgeSlug.GameSlug" - see NomenclatureEntry,
 	// addNomenclature, removeNomenclature.
@@ -164,17 +69,27 @@ type Registry struct {
 // NewRegistry builds a Registry for addrs (each "host:port"), all starting
 // Dead - call Start to make the initial attempt at each. Each entry's slug
 // is unknown until its first successful connect (see Conn.FetchNomenclature).
-func NewRegistry(dialer Dialer, config Config, addrs []string) *Registry {
-	entries := make(map[string]*entry, len(addrs))
-	for _, a := range addrs {
-		entries[a] = &entry{addr: a, state: StateDead}
-	}
-	return &Registry{
+func NewRegistry(dialer Dialer, config Config, addrs []string) (*Registry, error) {
+	r := Registry{
 		dialer:       dialer,
 		config:       config,
-		entries:      entries,
 		nomenclature: make(map[string]*NomenclatureEntry),
 	}
+
+	r.cartridgeNodesMap = make(map[string]string, len(addrs))
+	r.cartridgeNodes = make(map[string]*cartridgeNode, len(addrs))
+
+	for _, a := range addrs {
+		key, err := r.genNewCartridgeKey()
+		if err != nil {
+			return nil, err
+		}
+
+		r.cartridgeNodesMap[a] = key
+		r.cartridgeNodes[key] = &cartridgeNode{addr: a, state: StateDead}
+	}
+
+	return &r, nil
 }
 
 // Start attempts to connect to every tracked cartridge once. One that
@@ -183,14 +98,14 @@ func NewRegistry(dialer Dialer, config Config, addrs []string) *Registry {
 // manual push is what revives it.
 func (r *Registry) Start() {
 	r.mu.Lock()
-	addrs := make([]string, 0, len(r.entries))
-	for a := range r.entries {
-		addrs = append(addrs, a)
+	addrs := make([]string, 0, len(r.cartridgeNodes))
+	for _, node := range r.cartridgeNodes {
+		addrs = append(addrs, node.addr)
 	}
 	r.mu.Unlock()
 
-	for _, a := range addrs {
-		r.attemptConnect(a)
+	for _, addr := range addrs {
+		r.attemptConnect(addr)
 	}
 }
 
@@ -216,15 +131,33 @@ func (r *Registry) StartRetryScheduler() {
 	}()
 }
 
+// stopRetrySchedulerGrace bounds how long StopRetryScheduler waits for the
+// scheduler goroutine to actually exit - see its own doc comment for why
+// this can't just be an unbounded wait.
+const stopRetrySchedulerGrace = 500 * time.Millisecond
+
 // StopRetryScheduler stops the background loop started by
-// StartRetryScheduler and waits for it to finish. A no-op if it was never
-// started.
+// StartRetryScheduler and gives it stopRetrySchedulerGrace to finish. A
+// no-op if it was never started. Deliberately bounded, not an unbounded
+// <-r.schedulerDone wait: retryDueCartridges only checks r.schedulerStop
+// between due nodes (see its own doc comment), not while one is actually
+// in flight - a single due node whose attemptConnect is genuinely stuck
+// (dialing/fetching a dead cartridge, each step up to its own
+// Config.RequestTimeout) would otherwise make every app shutdown visibly
+// hang for however long that in-flight call takes, every time one happens
+// to be running at the moment Final is called. Giving up after a short
+// grace period instead costs nothing - the goroutine still exits on its
+// own once that call returns, there's just nothing left to coordinate
+// with it for by then.
 func (r *Registry) StopRetryScheduler() {
 	if r.schedulerStop == nil {
 		return
 	}
 	close(r.schedulerStop)
-	<-r.schedulerDone
+	select {
+	case <-r.schedulerDone:
+	case <-time.After(stopRetrySchedulerGrace):
+	}
 }
 
 // Announce is the HTTP-announce entry point: addr must already be tracked
@@ -236,12 +169,13 @@ func (r *Registry) StopRetryScheduler() {
 // ForceConnect is the deliberate way to give it another chance).
 func (r *Registry) Announce(addr string) {
 	r.mu.Lock()
-	e, exists := r.entries[addr]
+	key, exists := r.cartridgeNodesMap[addr]
 	if !exists {
 		r.mu.Unlock()
 		return
 	}
-	skip := e.state == StateConnected || e.state == StateCorrupted
+	node := r.cartridgeNodes[key]
+	skip := node.state == StateConnected || node.state == StateCorrupted
 	r.mu.Unlock()
 	if skip {
 		return
@@ -253,25 +187,39 @@ func (r *Registry) Announce(addr string) {
 // manage socket) and immediately attempts to connect to it - same
 // single-shot, no-retry-queue behavior as Start. A no-op if addr is
 // already tracked and Connected or Corrupted (see StateCorrupted).
-func (r *Registry) AddCartridge(addr string) {
+func (r *Registry) AddCartridge(addr string) error {
 	r.mu.Lock()
-	e, exists := r.entries[addr]
+	key, exists := r.cartridgeNodesMap[addr]
 	if !exists {
-		r.entries[addr] = &entry{addr: addr, state: StateDead}
-	} else if e.state == StateConnected || e.state == StateCorrupted {
-		r.mu.Unlock()
-		return
+		key, err := r.genNewCartridgeKey()
+		if err != nil {
+			return err
+		}
+		r.cartridgeNodesMap[addr] = key
+		r.cartridgeNodes[key] = &cartridgeNode{addr: addr, state: StateDead}
+	} else {
+		node := r.cartridgeNodes[key]
+		if node.state == StateConnected || node.state == StateCorrupted {
+			r.mu.Unlock()
+			return nil
+		}
 	}
 	r.mu.Unlock()
 	r.attemptConnect(addr)
+	return nil
 }
 
 // ForceConnect immediately attempts to (re)connect to addr, bypassing the
 // retry schedule. A no-op if addr isn't tracked or is already Connected.
 func (r *Registry) ForceConnect(addr string) {
 	r.mu.Lock()
-	e, ok := r.entries[addr]
-	if !ok || e.state == StateConnected {
+	key, ok := r.cartridgeNodesMap[addr]
+	if !ok {
+		r.mu.Unlock()
+		return
+	}
+	node := r.cartridgeNodes[key]
+	if node.state == StateConnected {
 		r.mu.Unlock()
 		return
 	}
@@ -286,9 +234,9 @@ func (r *Registry) ForceConnect(addr string) {
 func (r *Registry) PingKnown() {
 	r.mu.Lock()
 	var toCheck []string
-	for addr, e := range r.entries {
-		if e.state == StateConnected {
-			toCheck = append(toCheck, addr)
+	for _, node := range r.cartridgeNodes {
+		if node.state == StateConnected {
+			toCheck = append(toCheck, node.addr)
 		}
 	}
 	r.mu.Unlock()
@@ -303,27 +251,36 @@ func (r *Registry) PingKnown() {
 func (r *Registry) Status(addr string) (Status, bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	e, ok := r.entries[addr]
+	key, ok := r.cartridgeNodesMap[addr]
 	if !ok {
 		return Status{}, false
 	}
+	node := r.cartridgeNodes[key]
 	return Status{
-		Addr:        e.addr,
-		State:       e.state,
-		Attempts:    e.attempts,
+		Addr:        node.addr,
+		State:       node.state,
+		Attempts:    node.attempts,
 		MaxAttempts: r.config.MaxAttempts,
-		NextAttempt: e.nextAttempt,
+		NextAttempt: node.nextAttempt,
 	}, true
 }
 
-// NomenclatureEntry is one distinct game currently available, keyed by
-// "CartridgeSlug.GameSlug" - deduplicated across every currently-connected
-// node of the same cartridge that serves it, with the full list of nodes
-// that do in Entries (see PickNode).
-type NomenclatureEntry struct {
-	Key string
-	Nomenclature
-	Entries []string
+// AllStatuses returns a snapshot of every tracked cartridge, in no
+// particular order.
+func (r *Registry) AllStatuses() []Status {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]Status, 0, len(r.cartridgeNodes))
+	for _, node := range r.cartridgeNodes {
+		out = append(out, Status{
+			Addr:        node.addr,
+			State:       node.state,
+			Attempts:    node.attempts,
+			MaxAttempts: r.config.MaxAttempts,
+			NextAttempt: node.nextAttempt,
+		})
+	}
+	return out
 }
 
 // Nomenclature returns every distinct game currently available - a
@@ -344,33 +301,66 @@ func (r *Registry) Nomenclature() []NomenclatureEntry {
 	return out
 }
 
+// NomenclatureForLang returns every distinct game's
+// internationalized snapshot
+func (r *Registry) NomenclatureForLang(lang string) []map[string]any {
+	entries := r.Nomenclature()
+	games := make([]map[string]any, 0, len(entries))
+	for _, e := range entries {
+		info := map[string]any{
+			"key":             e.Key,
+			"title":           e.Title,
+			"slug":            e.Slug,
+			"version":         e.Version,
+			"description":     e.Description,
+			"genre":           e.Genre,
+			"icon":            e.Icon,
+			"banner":          e.Banner,
+			"durationMinutes": e.DurationMinutes,
+			"minSlots":        e.MinSlots,
+			"maxSlots":        e.MaxSlots,
+			"online":          e.Online,
+			"offline":         e.Offline,
+		}
+		if perKey, ok := e.Translations[lang]; ok {
+			for key, tr := range perKey {
+				if _, has := info[key]; has {
+					info[key] = tr
+				}
+			}
+		}
+		games = append(games, info)
+	}
+	return games
+}
+
 // PickNode returns the least-loaded currently-connected node serving key
 // ("CartridgeSlug.GameSlug", see NomenclatureEntry.Key) - "least-loaded"
 // measured by that node's own live active-room count at the moment of the
 // call. ok is false if no connected node currently serves key at all, or
 // none of them could be reached just now.
-func (r *Registry) PickNode(key string) (addr string, ok bool) {
+func (r *Registry) PickNode(gameKey string) (cartridgeNodeKey string, ok bool) {
 	type candidate struct {
-		addr string
+		key  string
 		conn Conn
 	}
 
 	r.mu.Lock()
 	var candidates []candidate
-	for a, e := range r.entries {
-		if e.state != StateConnected {
+	for key, node := range r.cartridgeNodes {
+		if node.state != StateConnected {
 			continue
 		}
-		for _, ne := range e.nomenclature {
-			if ne.Key == key {
-				candidates = append(candidates, candidate{addr: a, conn: e.conn})
+		for _, ne := range node.nomenclature {
+			if ne.Key == gameKey {
+				candidates = append(candidates, candidate{key: key, conn: node.conn})
 				break
 			}
 		}
 	}
 	r.mu.Unlock()
 
-	bestAddr := ""
+	bestKey := ""
 	bestCount := -1
 	for _, c := range candidates {
 		rooms, err := c.conn.FetchActiveRooms()
@@ -379,13 +369,41 @@ func (r *Registry) PickNode(key string) (addr string, ok bool) {
 		}
 		if bestCount == -1 || len(rooms) < bestCount {
 			bestCount = len(rooms)
-			bestAddr = c.addr
+			bestKey = c.key
 		}
 	}
-	if bestAddr == "" {
+	if bestKey == "" {
 		return "", false
 	}
-	return bestAddr, true
+	return bestKey, true
+}
+
+// NodeInfo is what a caller needs to act on one specific, already-chosen
+// cartridge node - returned by Node, below.
+type NodeInfo struct {
+	// Addr is the node's address - both WS (what Registry itself already
+	// dials) and HTTP (every cartridge now mounts both on the one port,
+	// see lxgo-ws's HTTP-mounted WSServer mode), there's only the one.
+	Addr string
+	// Conn is the node's live connection - the same one Registry itself
+	// uses for FetchNomenclature/FetchActiveRooms/Ping.
+	Conn Conn
+}
+
+// Node returns nodeKey's live address and connection, if it's still
+// tracked as Connected - (NodeInfo{}, false) otherwise. Unlike PickNode
+// (which chooses among candidates serving a game key), this looks up one
+// specific, already-chosen node by the key PickNode returned earlier -
+// e.g. to relay a follow-up request to the exact node a game session was
+// pinned to.
+func (r *Registry) Node(nodeKey string) (NodeInfo, bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	node, exists := r.cartridgeNodes[nodeKey]
+	if !exists || node.state != StateConnected {
+		return NodeInfo{}, false
+	}
+	return NodeInfo{Addr: node.addr, Conn: node.conn}, true
 }
 
 // ActiveRooms pulls every currently Connected cartridge's active instances
@@ -395,9 +413,9 @@ func (r *Registry) PickNode(key string) (addr string, ok bool) {
 func (r *Registry) ActiveRooms() []Room {
 	r.mu.Lock()
 	var conns []Conn
-	for _, e := range r.entries {
-		if e.state == StateConnected {
-			conns = append(conns, e.conn)
+	for _, node := range r.cartridgeNodes {
+		if node.state == StateConnected {
+			conns = append(conns, node.conn)
 		}
 	}
 	r.mu.Unlock()
@@ -423,18 +441,23 @@ func (r *Registry) ActiveRooms() []Room {
 // connection.
 func (r *Registry) attemptConnect(addr string) {
 	r.mu.Lock()
-	e := r.entries[addr]
-	if e == nil || e.connecting || e.state == StateConnected {
+	key, ok := r.cartridgeNodesMap[addr]
+	if !ok {
 		r.mu.Unlock()
 		return
 	}
-	e.connecting = true
+	node := r.cartridgeNodes[key]
+	if node.connecting || node.state == StateConnected {
+		r.mu.Unlock()
+		return
+	}
+	node.connecting = true
 	r.mu.Unlock()
 
 	defer func() {
 		r.mu.Lock()
-		if e := r.entries[addr]; e != nil {
-			e.connecting = false
+		if node := r.cartridgeNodes[key]; node != nil {
+			node.connecting = false
 		}
 		r.mu.Unlock()
 	}()
@@ -456,8 +479,14 @@ func (r *Registry) attemptConnect(addr string) {
 	}
 
 	r.mu.Lock()
-	e = r.entries[addr]
-	if e == nil {
+	key, ok = r.cartridgeNodesMap[addr]
+	if !ok {
+		r.mu.Unlock()
+		conn.Close()
+		return
+	}
+	node = r.cartridgeNodes[key]
+	if node == nil {
 		r.mu.Unlock()
 		conn.Close()
 		return
@@ -465,23 +494,23 @@ func (r *Registry) attemptConnect(addr string) {
 
 	mine := r.addNomenclature(addr, slug, nomenclature)
 	if len(nomenclature) > 0 && len(mine) == 0 {
-		e.state = StateCorrupted
-		e.conn = nil
+		node.state = StateCorrupted
+		node.conn = nil
 		r.mu.Unlock()
 		conn.Close()
 		r.logError(fmt.Sprintf(
-			"cartridges: node %s marked corrupted - all %d reported game(s) conflicted with already-registered data under the same key",
+			"cartridges: node %s marked corrupted - all %d reported game(s) were rejected (see the error(s) just above for why each one was)",
 			addr, len(nomenclature),
 		))
 		return
 	}
 
-	e.state = StateConnected
-	e.conn = conn
-	e.slug = slug
-	e.nomenclature = mine
-	e.everConnected = true
-	e.attempts = 0
+	node.state = StateConnected
+	node.conn = conn
+	node.slug = slug
+	node.nomenclature = mine
+	node.everConnected = true
+	node.attempts = 0
 	r.mu.Unlock()
 }
 
@@ -500,26 +529,27 @@ func (r *Registry) attemptConnect(addr string) {
 func (r *Registry) handleAttemptFailure(addr string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	e := r.entries[addr]
-	if e == nil {
+	key, ok := r.cartridgeNodesMap[addr]
+	if !ok {
 		return
 	}
-	e.conn = nil
-	r.removeNomenclature(e)
+	node := r.cartridgeNodes[key]
+	node.conn = nil
+	r.removeNomenclature(node)
 
-	if !e.everConnected {
-		e.state = StateDead
+	if !node.everConnected {
+		node.state = StateDead
 		return
 	}
 
-	e.attempts++
-	if e.attempts >= r.config.MaxAttempts {
-		e.state = StateDead
-		e.attempts = 0
+	node.attempts++
+	if node.attempts >= r.config.MaxAttempts {
+		node.state = StateDead
+		node.attempts = 0
 		return
 	}
-	e.state = StatePendingRetry
-	e.nextAttempt = time.Now().Add(r.config.RetryInterval)
+	node.state = StatePendingRetry
+	node.nextAttempt = time.Now().Add(r.config.RetryInterval)
 }
 
 // handleDeregister is the Dialer's onDeregister callback - a graceful
@@ -527,16 +557,17 @@ func (r *Registry) handleAttemptFailure(addr string) {
 // Dead.
 func (r *Registry) handleDeregister(addr string) {
 	r.mu.Lock()
-	e := r.entries[addr]
-	if e == nil {
+	key, ok := r.cartridgeNodesMap[addr]
+	if !ok {
 		r.mu.Unlock()
 		return
 	}
-	conn := e.conn
-	e.state = StateDead
-	e.conn = nil
-	e.attempts = 0
-	r.removeNomenclature(e)
+	node := r.cartridgeNodes[key]
+	conn := node.conn
+	node.state = StateDead
+	node.conn = nil
+	node.attempts = 0
+	r.removeNomenclature(node)
 	r.mu.Unlock()
 
 	if conn != nil {
@@ -560,19 +591,28 @@ func (r *Registry) handleDropped(addr string) {
 // fast as intended.
 func (r *Registry) pingEntry(addr string) {
 	r.mu.Lock()
-	e := r.entries[addr]
-	if e == nil || e.state != StateConnected || e.connecting {
+	key, ok := r.cartridgeNodesMap[addr]
+	if !ok {
 		r.mu.Unlock()
 		return
 	}
-	e.connecting = true
-	conn := e.conn
+	node := r.cartridgeNodes[key]
+	if node.state != StateConnected || node.connecting {
+		r.mu.Unlock()
+		return
+	}
+	node.connecting = true
+	conn := node.conn
 	r.mu.Unlock()
 
 	defer func() {
 		r.mu.Lock()
-		if e := r.entries[addr]; e != nil {
-			e.connecting = false
+		key, ok := r.cartridgeNodesMap[addr]
+		if ok {
+			node := r.cartridgeNodes[key]
+			if node != nil {
+				node.connecting = false
+			}
 		}
 		r.mu.Unlock()
 	}()
@@ -584,16 +624,41 @@ func (r *Registry) pingEntry(addr string) {
 	r.handleAttemptFailure(addr)
 }
 
+// invalidSlug reports whether s can't be used as a cartridge's own slug or
+// a game's slug - a "." would make NomenclatureEntry.Key ("cartridgeSlug" +
+// "." + "gameSlug") ambiguous between two different (cartridge, game)
+// pairs.
+func invalidSlug(s string) bool {
+	return strings.Contains(s, ".")
+}
+
 // addNomenclature registers addr's freshly-fetched games into the
 // registry-wide index (r.nomenclature), returning the subset addr actually
 // ends up contributing to - a game whose key is already claimed by a
 // different node reporting different data is rejected (logged through
-// Config.OnLogError, not merged or overwritten). Must be called with r.mu
-// held, and only for an addr whose prior contributions (if any) have
-// already been cleared via removeNomenclature.
+// Config.OnLogError, not merged or overwritten), and so is a game (or every
+// game, if slug itself is the problem) whose slug contains "." (see
+// invalidSlug). Must be called with r.mu held, and only for an addr whose
+// prior contributions (if any) have already been cleared via
+// removeNomenclature.
 func (r *Registry) addNomenclature(addr, slug string, list []Nomenclature) []*NomenclatureEntry {
+	if invalidSlug(slug) {
+		r.logError(fmt.Sprintf(
+			"cartridges: node %s reports an invalid cartridge slug %q (contains \".\") - rejecting all its games",
+			addr, slug,
+		))
+		return nil
+	}
+
 	var mine []*NomenclatureEntry
 	for _, n := range list {
+		if invalidSlug(n.Slug) {
+			r.logError(fmt.Sprintf(
+				"cartridges: node %s reports an invalid game slug %q (contains \".\") - rejecting this game",
+				addr, n.Slug,
+			))
+			continue
+		}
 		key := slug + "." + n.Slug
 		existing, ok := r.nomenclature[key]
 		if !ok {
@@ -602,7 +667,7 @@ func (r *Registry) addNomenclature(addr, slug string, list []Nomenclature) []*No
 			mine = append(mine, ne)
 			continue
 		}
-		if existing.Nomenclature != n {
+		if !reflect.DeepEqual(existing.Nomenclature, n) {
 			r.logError(fmt.Sprintf(
 				"cartridges: node %s reports conflicting nomenclature for %q (have %+v, got %+v) - rejecting this node's copy",
 				addr, key, existing.Nomenclature, n,
@@ -620,10 +685,10 @@ func (r *Registry) addNomenclature(addr, slug string, list []Nomenclature) []*No
 // backs it any more, and clears e.nomenclature. A no-op if e wasn't
 // contributing to anything (e.g. it never successfully connected). Must be
 // called with r.mu held.
-func (r *Registry) removeNomenclature(e *entry) {
-	for _, ne := range e.nomenclature {
+func (r *Registry) removeNomenclature(node *cartridgeNode) {
+	for _, ne := range node.nomenclature {
 		for i, a := range ne.Entries {
-			if a == e.addr {
+			if a == node.addr {
 				ne.Entries = append(ne.Entries[:i], ne.Entries[i+1:]...)
 				break
 			}
@@ -632,7 +697,7 @@ func (r *Registry) removeNomenclature(e *entry) {
 			delete(r.nomenclature, ne.Key)
 		}
 	}
-	e.nomenclature = nil
+	node.nomenclature = nil
 }
 
 // logError reports msg through Config.OnLogError, if set - a no-op
@@ -647,14 +712,34 @@ func (r *Registry) retryDueCartridges() {
 	now := time.Now()
 	r.mu.Lock()
 	var due []string
-	for addr, e := range r.entries {
-		if e.state == StatePendingRetry && !e.nextAttempt.After(now) {
-			due = append(due, addr)
+	for _, node := range r.cartridgeNodes {
+		if node.state == StatePendingRetry && !node.nextAttempt.After(now) {
+			due = append(due, node.addr)
 		}
 	}
 	r.mu.Unlock()
 
 	for _, addr := range due {
+		select {
+		case <-r.schedulerStop:
+			return
+		default:
+		}
 		r.attemptConnect(addr)
+	}
+}
+
+func (r *Registry) genNewCartridgeKey() (string, error) {
+	attemptsLim := 100
+	attempts := 0
+	for {
+		key := utils.GenRandomHash(16)
+		if _, exists := r.cartridgeNodes[key]; !exists {
+			return key, nil
+		}
+		attempts++
+		if attempts >= attemptsLim {
+			return "", errors.New("cartridge key generation failed")
+		}
 	}
 }

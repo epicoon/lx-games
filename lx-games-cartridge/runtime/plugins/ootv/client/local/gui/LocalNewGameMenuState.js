@@ -45,7 +45,7 @@ class LocalNewGameMenuState extends lxGames.ootv.NewGameMenuState {
             Object.keys(lx>>>Const.GAMERS).forEach(color=>{
                 data.push({
                     colorId: color,
-                    icon: lx>>>Const.GAMERS[color].color + '.jpg',
+                    icon: lx>>>Const.GAMERS[color].avatar + '.jpg',
                     name: lx>>>Const.GAMERS[color].name
                 });
             });

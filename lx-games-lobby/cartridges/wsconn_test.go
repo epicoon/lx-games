@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"reflect"
 	"testing"
 	"time"
 
@@ -128,8 +129,8 @@ func dialWithRetry(t *testing.T, addr string, onDeregister, onDropped func()) Co
 }
 
 func TestDial_RoundTrip_FetchesNomenclatureAndPingsAndFetchesRooms(t *testing.T) {
-	s, addr := newFakeCartridgeServer(t, "cofb-lobby", []map[string]any{
-		{"name": "Castles of Burgundy", "slug": "cofb", "minSlots": 2, "maxSlots": 4, "online": true, "offline": true},
+	s, addr := newFakeCartridgeServer(t, "demo-lobby", []map[string]any{
+		{"title": "Demo Game", "slug": "demo", "minSlots": 2, "maxSlots": 4, "online": true, "offline": true},
 	})
 	t.Cleanup(s.Stop)
 
@@ -140,15 +141,15 @@ func TestDial_RoundTrip_FetchesNomenclatureAndPingsAndFetchesRooms(t *testing.T)
 	if err != nil {
 		t.Fatalf("FetchNomenclature: %v", err)
 	}
-	if slug != "cofb-lobby" {
-		t.Fatalf("expected the reported cartridge slug %q, got %q", "cofb-lobby", slug)
+	if slug != "demo-lobby" {
+		t.Fatalf("expected the reported cartridge slug %q, got %q", "demo-lobby", slug)
 	}
 	if len(nomenclature) != 1 {
 		t.Fatalf("expected exactly one nomenclature entry, got %d: %#v", len(nomenclature), nomenclature)
 	}
 	got := nomenclature[0]
-	want := Nomenclature{Name: "Castles of Burgundy", Slug: "cofb", MinSlots: 2, MaxSlots: 4, Online: true, Offline: true}
-	if got != want {
+	want := Nomenclature{Title: "Demo Game", Slug: "demo", MinSlots: 2, MaxSlots: 4, Online: true, Offline: true}
+	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("nomenclature = %+v, want %+v", got, want)
 	}
 
@@ -170,7 +171,7 @@ func TestDial_ConcurrentRequests_DontCrossTalk(t *testing.T) {
 	// asked for them, not whichever happened to be waiting first - this is
 	// exactly what the request/response key correlation in ws.IClient exists
 	// to guarantee.
-	s, addr := newFakeCartridgeServer(t, "cofb-lobby", []map[string]any{{"slug": "cofb"}})
+	s, addr := newFakeCartridgeServer(t, "demo-lobby", []map[string]any{{"slug": "demo"}})
 	t.Cleanup(s.Stop)
 
 	conn := dialWithRetry(t, addr, func() {}, func() {})
@@ -183,7 +184,7 @@ func TestDial_ConcurrentRequests_DontCrossTalk(t *testing.T) {
 			errs <- err
 			return
 		}
-		if slug != "cofb-lobby" || len(nomenclature) != 1 || nomenclature[0].Slug != "cofb" {
+		if slug != "demo-lobby" || len(nomenclature) != 1 || nomenclature[0].Slug != "demo" {
 			errs <- fmt.Errorf("unexpected slug/nomenclature: %q, %#v", slug, nomenclature)
 			return
 		}
@@ -288,12 +289,12 @@ func TestAsObject_NilReturnsEmptyNotError(t *testing.T) {
 }
 
 func TestAsObject_PassesThroughAnActualObject(t *testing.T) {
-	in := map[string]any{"slug": "cofb"}
+	in := map[string]any{"slug": "demo"}
 	obj, err := asObject(in)
 	if err != nil {
 		t.Fatalf("asObject(%#v): unexpected error: %v", in, err)
 	}
-	if obj["slug"] != "cofb" {
+	if obj["slug"] != "demo" {
 		t.Fatalf("asObject(%#v) = %#v, want the same object", in, obj)
 	}
 }
@@ -308,26 +309,61 @@ func TestAsObject_NonObjectBody_ReturnsError(t *testing.T) {
 
 func TestDecodeNomenclature_ReadsSlugAndGames(t *testing.T) {
 	body := map[string]any{
-		"slug": "cofb-lobby",
+		"slug": "demo-lobby",
 		"games": []any{
-			map[string]any{"name": "Castles of Burgundy", "slug": "cofb", "minSlots": float64(2), "maxSlots": float64(4), "online": true},
+			map[string]any{"title": "Demo Game", "slug": "demo", "minSlots": float64(2), "maxSlots": float64(4), "online": true},
 		},
 	}
 	slug, games, err := decodeNomenclature(body)
 	if err != nil {
 		t.Fatalf("decodeNomenclature: %v", err)
 	}
-	if slug != "cofb-lobby" {
-		t.Fatalf("expected slug %q, got %q", "cofb-lobby", slug)
+	if slug != "demo-lobby" {
+		t.Fatalf("expected slug %q, got %q", "demo-lobby", slug)
 	}
-	if len(games) != 1 || games[0].Name != "Castles of Burgundy" || games[0].Slug != "cofb" || games[0].MinSlots != 2 || games[0].MaxSlots != 4 || !games[0].Online {
+	if len(games) != 1 || games[0].Title != "Demo Game" || games[0].Slug != "demo" || games[0].MinSlots != 2 || games[0].MaxSlots != 4 || !games[0].Online {
 		t.Fatalf("unexpected games: %#v", games)
+	}
+}
+
+// A malformed game (wrong type for a numeric/bool field, so cast.MapToStruct
+// fails) is skipped on its own - it must not take down the rest of an
+// otherwise-valid games list, decodeNomenclature's cast.MapToStruct call.
+func TestDecodeNomenclature_SkipsOnlyTheMalformedGame(t *testing.T) {
+	body := map[string]any{
+		"slug": "demo-lobby",
+		"games": []any{
+			map[string]any{"title": "Demo Game", "slug": "demo", "minSlots": float64(2), "maxSlots": float64(4), "online": true},
+			// minSlots is a bool here, not a number - cast.MapToStruct must
+			// fail on this one entry specifically.
+			map[string]any{"title": "Broken Game", "slug": "broken", "minSlots": true, "maxSlots": float64(4), "online": true},
+		},
+	}
+	_, games, err := decodeNomenclature(body)
+	if err != nil {
+		t.Fatalf("decodeNomenclature: %v", err)
+	}
+	if len(games) != 1 || games[0].Slug != "demo" {
+		t.Fatalf("expected only the well-formed game to survive, got: %#v", games)
 	}
 }
 
 func TestDecodeNomenclature_NonObjectBody_ReturnsError(t *testing.T) {
 	if _, _, err := decodeNomenclature("not an object"); err == nil {
 		t.Fatalf("expected an error for a non-object nomenclature body")
+	}
+}
+
+func TestDecodeRooms_ReadsInstanceIdAndSlug(t *testing.T) {
+	body := []any{
+		map[string]any{"instanceId": "abc123", "slug": "demo"},
+	}
+	rooms, err := decodeRooms(body)
+	if err != nil {
+		t.Fatalf("decodeRooms: %v", err)
+	}
+	if len(rooms) != 1 || rooms[0].InstanceID != "abc123" || rooms[0].Slug != "demo" {
+		t.Fatalf("unexpected rooms: %#v", rooms)
 	}
 }
 

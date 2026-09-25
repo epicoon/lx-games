@@ -1,6 +1,6 @@
 # lx-games-lobby
 
-> Actual version: `v0.1.0-alpha.2`. [Details](./CHANGE_LOG.md)
+> Actual version: `v0.1.0-alpha.3`. [Details](./CHANGE_LOG.md)
 
 ## Prepare
 
@@ -11,7 +11,7 @@ cp runtime/config-local-example.yaml runtime/config-local.yaml
 
 Then edit both - needed whether you run locally or in Docker below.
 `runtime/.env` overrides `runtime/config.yaml`'s `${VAR}` placeholders
-(ports, `WS_HOST`); absent entirely, the defaults baked into `config.yaml`
+(the app's port); absent entirely, the defaults baked into `config.yaml`
 apply. `runtime/config-local.yaml` sets `Cartridges` - which cartridges
 this lobby is allowed to dial, see its own comment - and a few other
 per-deployment overrides; `config.yaml`'s `Local: config-local.yaml` merges
@@ -36,9 +36,9 @@ docker compose up -d --build
 find a compose file by walking up parent directories, but it still looks
 for `.env` wherever it was actually invoked from.
 
-`WS_HOST` defaults to `0.0.0.0` in `.env.example` - the WS listener has to
-bind every interface for its published port to actually be reachable from
-outside the container at all.
+The app (including its WS endpoint, mounted on the same HTTP server - see
+`lxgo-ws`'s README) listens on every interface by default, so its single
+published port is reachable from outside the container.
 
 `docker-compose.yml` mounts `./runtime` into the container, so
 `runtime/config.yaml`/`runtime/config-local.yaml` edits (adding a

@@ -14,6 +14,7 @@ cacheType: inherit
 
 # --- Server ---
 server:
+  key: lobby.LobbyPlugin
   rootSnippet: snippets/_root.js
   snippets:
     - snippets
@@ -22,7 +23,15 @@ server:
 client:
   file: Plugin.js
   require:
-    - guiNodes/
+    - client/Core.js
+    - client/guiHelpers/
+    - client/guiNodes/
+
+  core: lxGames.lobby.Core
 
   guiNodes:
     main: lxGames.lobby.GuiMain
+    topbar: lxGames.lobby.GuiTopbar
+    rail: lxGames.lobby.GuiRail
+    center: lxGames.lobby.GuiCenter
+    detail: lxGames.lobby.GuiDetail

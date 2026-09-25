@@ -170,8 +170,6 @@ function _buildSchema(self, cells) {
         });
         hex.style('background-color', _getGroupColor(cell.group));
 
-        // hex.add(lx.Box, {geom: true, text: '' + cell.dice}).align(lx.CENTER, lx.MIDDLE);
-
         let dice = hex.add(lx.Box, {
             geom: [25, 25, 50, 50],
         })

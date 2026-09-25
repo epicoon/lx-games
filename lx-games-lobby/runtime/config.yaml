@@ -1,11 +1,18 @@
-Local: config-local.yaml
+Import: [config-local.yaml]
 
-Port: ${APP_PORT:-8000}
+Host: ${APP_HOST:-localhost}
+Port: ${APP_PORT:-8090}
+
+# Forwarded to the browser via lx-app.yaml's params (@config(...)) - the
+# browser's own WS client needs an explicit port because it never
+# inherits the current page's port implicitly (see Core.js); Port itself
+# isn't necessarily what's reachable from outside (see runtime/.env's
+# APP_PORT_EXTERNAL, for Docker's port mapping).
+Params:
+  AppPortExternal: ${APP_PORT_EXTERNAL:-8000}
 
 Components:
   WSServer:
-    Host: ${WS_HOST:-localhost}
-    Port: ${WS_PORT:-8001}
     DefaultChannel:
       Key: lobby
       SharedData:
@@ -18,3 +25,4 @@ Components:
     AssetLinksPath:
       Inner: runtime/web/assets
       Outer: /web
+    AppConfig: runtime/lx-app.yaml

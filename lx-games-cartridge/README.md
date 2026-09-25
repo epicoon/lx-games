@@ -1,6 +1,6 @@
 # lx-games-cartridge
 
-> Actual version: `v0.1.0-alpha.2`. [Details](./CHANGE_LOG.md)
+> Actual version: `v0.1.0-alpha.3`. [Details](./CHANGE_LOG.md)
 
 ## Prepare
 
@@ -11,7 +11,7 @@ cp runtime/config-local-example.yaml runtime/config-local.yaml
 
 Then edit both - needed whether you run locally or in Docker below.
 `runtime/.env` overrides `runtime/config.yaml`'s `${VAR}` placeholders
-(ports, `WS_HOST`, `CARTRIDGE_SLUG`, `LOBBY_URL`,
+(ports, `CARTRIDGE_SLUG`, `LOBBY_URL`,
 `CARTRIDGE_ADVERTISE_ADDR`); absent entirely, the defaults baked into
 `config.yaml` apply, including an empty `LobbyURL` (no lobby configured -
 this app is fully usable standalone either way). `runtime/config-local.yaml`
@@ -54,14 +54,13 @@ above) is that lobby's real, externally reachable URL (a different server,
 a different Docker host, wherever it actually is) - not a Docker service
 name, since the two are never assumed to share a network.
 
-`WS_HOST` defaults to `0.0.0.0` in `.env.example` - the WS listener has to
-bind every interface for its published port to actually be reachable from
-outside the container at all, which is exactly why `CARTRIDGE_ADVERTISE_ADDR`
-usually needs setting too: the address this app announces to the lobby has
-to be something the lobby can actually dial back into, and `0.0.0.0:<port>`
-isn't - set it to this host's real address and `WS_PORT_EXTERNAL` (the
-externally reachable port, which needn't match the container-internal
-`WS_PORT` at all).
+The app (including its WS endpoint, mounted on the same HTTP server - see
+`lxgo-ws`'s README) listens on every interface by default, which is
+exactly why `CARTRIDGE_ADVERTISE_ADDR` usually needs setting in Docker:
+the address this app announces to the lobby has to be something the lobby
+can actually dial back into - set it to this host's real address and
+`APP_PORT_EXTERNAL` (the externally reachable port, which needn't match
+the container-internal `APP_PORT` at all).
 
 `docker-compose.yml` mounts `./runtime` into the container, so
 `runtime/config.yaml` edits take effect on the next restart without

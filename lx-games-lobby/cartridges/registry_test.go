@@ -32,6 +32,9 @@ func (c *fakeConn) FetchActiveRooms() ([]Room, error) {
 	defer c.mu.Unlock()
 	return c.activeRooms, nil
 }
+func (c *fakeConn) FetchGame(slug, lang string) (map[string]any, error) {
+	return nil, fmt.Errorf("fakeConn.FetchGame not implemented")
+}
 func (c *fakeConn) Ping() error {
 	c.mu.Lock()
 	onEnter := c.onPingEnter
@@ -140,9 +143,21 @@ func testConfig() Config {
 	return Config{RetryInterval: 20 * time.Millisecond, MaxAttempts: 3}
 }
 
+// newTestRegistry wraps NewRegistry for tests - cartridge-key generation is
+// the only failure mode, vanishingly unlikely with a handful of addrs, so
+// tests treat it as a setup failure rather than a case worth asserting on.
+func newTestRegistry(t *testing.T, dialer Dialer, cfg Config, addrs []string) *Registry {
+	t.Helper()
+	r, err := NewRegistry(dialer, cfg, addrs)
+	if err != nil {
+		t.Fatalf("NewRegistry: %v", err)
+	}
+	return r
+}
+
 func TestRegistry_Start_ReachableAddrBecomesConnected(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 
 	r.Start()
 
@@ -158,7 +173,7 @@ func TestRegistry_Start_ReachableAddrBecomesConnected(t *testing.T) {
 func TestRegistry_Start_UnreachableAddrIsDeadNotQueued(t *testing.T) {
 	dialer := newFakeDialer()
 	dialer.dead["localhost:8093"] = true
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 
 	r.Start()
 
@@ -176,7 +191,7 @@ func TestRegistry_Start_UnreachableAddrIsDeadNotQueued(t *testing.T) {
 
 func TestRegistry_Announce_UnknownAddrIsIgnored(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 
 	r.Announce("localhost:9999") // not in the configured addrs at all
 
@@ -190,7 +205,7 @@ func TestRegistry_Announce_UnknownAddrIsIgnored(t *testing.T) {
 
 func TestRegistry_Announce_AlreadyConnectedDoesNotRedial(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 	if calls := dialer.callCount("localhost:8093"); calls != 1 {
 		t.Fatalf("setup: expected exactly one dial from Start, got %d", calls)
@@ -205,7 +220,7 @@ func TestRegistry_Announce_AlreadyConnectedDoesNotRedial(t *testing.T) {
 
 func TestRegistry_AddCartridge_TracksAndConnectsImmediately(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), nil) // starts with nothing configured
+	r := newTestRegistry(t, dialer.Dial, testConfig(), nil) // starts with nothing configured
 
 	r.AddCartridge("localhost:8094")
 
@@ -220,7 +235,7 @@ func TestRegistry_AddCartridge_TracksAndConnectsImmediately(t *testing.T) {
 
 func TestRegistry_PingFailureOnConnectedEntry_EntersRetryQueue(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
 	dialer.conn("localhost:8093").failPing = true
@@ -248,7 +263,7 @@ func TestRegistry_PingFailureOnConnectedEntry_EntersRetryQueue(t *testing.T) {
 // MaxAttempts.
 func TestRegistry_PingKnown_ConcurrentCalls_CountFailureOnlyOnce(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
 	conn := dialer.conn("localhost:8093")
@@ -286,7 +301,7 @@ func TestRegistry_PingKnown_ConcurrentCalls_CountFailureOnlyOnce(t *testing.T) {
 
 func TestRegistry_PingKnown_LeavesHealthyConnectionAlone(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
 	r.PingKnown()
@@ -303,7 +318,7 @@ func TestRegistry_PingKnown_LeavesHealthyConnectionAlone(t *testing.T) {
 func TestRegistry_RetryQueue_ExhaustsToDeadAfterMaxAttempts(t *testing.T) {
 	dialer := newFakeDialer()
 	cfg := Config{RetryInterval: 5 * time.Millisecond, MaxAttempts: 2}
-	r := NewRegistry(dialer.Dial, cfg, []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, cfg, []string{"localhost:8093"})
 	r.Start()
 
 	// First failure: connected -> pending-retry (attempts=1).
@@ -331,7 +346,7 @@ func TestRegistry_RetryQueue_ExhaustsToDeadAfterMaxAttempts(t *testing.T) {
 
 func TestRegistry_Deregister_GoesStraightToDeadNotRetryQueue(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
 	dialer.triggerDeregister("localhost:8093")
@@ -347,7 +362,7 @@ func TestRegistry_Deregister_GoesStraightToDeadNotRetryQueue(t *testing.T) {
 
 func TestRegistry_Dropped_EntersRetryQueueLikeAFailedPing(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
 	dialer.triggerDropped("localhost:8093")
@@ -375,7 +390,7 @@ func TestRegistry_ConcurrentAttempts_DialOnlyOncePerAddr(t *testing.T) {
 		once.Do(func() { close(entered) })
 		<-proceed
 	}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 
 	firstDone := make(chan struct{})
 	go func() {
@@ -414,14 +429,14 @@ func TestRegistry_ConcurrentAttempts_DialOnlyOncePerAddr(t *testing.T) {
 func TestRegistry_Nomenclature_AggregatesOnlyConnectedEntries(t *testing.T) {
 	dialer := newFakeDialer()
 	dialer.dead["localhost:8094"] = true
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb"}}
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo"}}
 	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "should-not-appear"}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093", "localhost:8094"})
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093", "localhost:8094"})
 
 	r.Start()
 
 	all := r.Nomenclature()
-	if len(all) != 1 || all[0].Slug != "cofb" {
+	if len(all) != 1 || all[0].Slug != "demo" {
 		t.Fatalf("expected only the Connected addr's nomenclature, got %v", all)
 	}
 }
@@ -434,13 +449,13 @@ func TestRegistry_Nomenclature_AggregatesOnlyConnectedEntries(t *testing.T) {
 // order over Registry.entries.
 func TestRegistry_FullNomenclatureConflict_MarksCorrupted(t *testing.T) {
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb", MinSlots: 2}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo", MinSlots: 2}}
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
-	dialer.presetSlug["localhost:8094"] = "cofb"
-	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "cofb", MinSlots: 4}} // same key, conflicting data
+	dialer.presetSlug["localhost:8094"] = "demo"
+	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "demo", MinSlots: 4}} // same key, conflicting data
 	r.AddCartridge("localhost:8094")
 
 	st, _ := r.Status("localhost:8094")
@@ -459,13 +474,13 @@ func TestRegistry_FullNomenclatureConflict_MarksCorrupted(t *testing.T) {
 
 func TestRegistry_Corrupted_AnnounceAndAddCartridgeDoNotRedial(t *testing.T) {
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb", MinSlots: 2}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo", MinSlots: 2}}
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
-	dialer.presetSlug["localhost:8094"] = "cofb"
-	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "cofb", MinSlots: 4}}
+	dialer.presetSlug["localhost:8094"] = "demo"
+	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "demo", MinSlots: 4}}
 	r.AddCartridge("localhost:8094")
 	if st, _ := r.Status("localhost:8094"); st.State != StateCorrupted {
 		t.Fatalf("setup: expected StateCorrupted, got %v", st.State)
@@ -492,12 +507,12 @@ func TestRegistry_PartialNomenclatureConflict_RejectsOnlyConflictingGame(t *test
 	cfg.OnLogError = func(msg string) { loggedErrors = append(loggedErrors, msg) }
 
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
+	dialer.presetSlug["localhost:8093"] = "demo"
 	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "gameA", MinSlots: 2}}
-	r := NewRegistry(dialer.Dial, cfg, []string{"localhost:8093"})
+	r := newTestRegistry(t, dialer.Dial, cfg, []string{"localhost:8093"})
 	r.Start()
 
-	dialer.presetSlug["localhost:8094"] = "cofb"
+	dialer.presetSlug["localhost:8094"] = "demo"
 	dialer.presetNC["localhost:8094"] = []Nomenclature{
 		{Slug: "gameA", MinSlots: 4}, // conflicts with localhost:8093's gameA
 		{Slug: "gameB", MinSlots: 2}, // new game, no conflict
@@ -523,15 +538,66 @@ func TestRegistry_PartialNomenclatureConflict_RejectsOnlyConflictingGame(t *test
 	}
 }
 
-func TestRegistry_SameGameFromTwoNodes_SharesOneEntryAcrossEntries(t *testing.T) {
+func TestRegistry_InvalidCartridgeSlug_MarksCorrupted(t *testing.T) {
+	var loggedErrors []string
+	cfg := testConfig()
+	cfg.OnLogError = func(msg string) { loggedErrors = append(loggedErrors, msg) }
+
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb", MinSlots: 2, MaxSlots: 4}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	dialer.presetSlug["localhost:8093"] = "demo.cartridge" // invalid: contains "."
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "gameA"}}
+	r := newTestRegistry(t, dialer.Dial, cfg, []string{"localhost:8093"})
 	r.Start()
 
-	dialer.presetSlug["localhost:8094"] = "cofb"
-	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "cofb", MinSlots: 2, MaxSlots: 4}} // identical data - a load-balancing sibling, not a conflict
+	st, _ := r.Status("localhost:8093")
+	if st.State != StateCorrupted {
+		t.Fatalf("expected a node reporting an invalid cartridge slug to end up StateCorrupted, got %v", st.State)
+	}
+	if len(loggedErrors) != 2 { // the invalid-slug rejection itself, plus the "marked corrupted" summary
+		t.Fatalf("expected 2 logged errors, got %d: %v", len(loggedErrors), loggedErrors)
+	}
+	if len(r.Nomenclature()) != 0 {
+		t.Fatalf("expected no games registered for an invalid cartridge slug, got %#v", r.Nomenclature())
+	}
+}
+
+func TestRegistry_InvalidGameSlug_RejectsOnlyThatGame(t *testing.T) {
+	var loggedErrors []string
+	cfg := testConfig()
+	cfg.OnLogError = func(msg string) { loggedErrors = append(loggedErrors, msg) }
+
+	dialer := newFakeDialer()
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{
+		{Slug: "game.a"}, // invalid: contains "."
+		{Slug: "gameB"},  // valid
+	}
+	r := newTestRegistry(t, dialer.Dial, cfg, []string{"localhost:8093"})
+	r.Start()
+
+	st, _ := r.Status("localhost:8093")
+	if st.State != StateConnected {
+		t.Fatalf("expected the node to stay Connected despite one invalid game slug, got %v", st.State)
+	}
+	if len(loggedErrors) != 1 {
+		t.Fatalf("expected exactly one logged rejection, got %d: %v", len(loggedErrors), loggedErrors)
+	}
+
+	all := r.Nomenclature()
+	if len(all) != 1 || all[0].Slug != "gameB" {
+		t.Fatalf("expected only gameB to be registered, got %#v", all)
+	}
+}
+
+func TestRegistry_SameGameFromTwoNodes_SharesOneEntryAcrossEntries(t *testing.T) {
+	dialer := newFakeDialer()
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo", MinSlots: 2, MaxSlots: 4}}
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r.Start()
+
+	dialer.presetSlug["localhost:8094"] = "demo"
+	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "demo", MinSlots: 2, MaxSlots: 4}} // identical data - a load-balancing sibling, not a conflict
 	r.AddCartridge("localhost:8094")
 
 	if st, _ := r.Status("localhost:8094"); st.State != StateConnected {
@@ -550,9 +616,9 @@ func TestRegistry_SameGameFromTwoNodes_SharesOneEntryAcrossEntries(t *testing.T)
 
 func TestRegistry_NodeDisconnect_RemovesItsSoleNomenclatureContribution(t *testing.T) {
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb"}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo"}}
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
 	if len(r.Nomenclature()) != 1 {
@@ -568,13 +634,13 @@ func TestRegistry_NodeDisconnect_RemovesItsSoleNomenclatureContribution(t *testi
 
 func TestRegistry_NodeDisconnect_SharedGameSurvivesViaOtherNode(t *testing.T) {
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb"}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo"}}
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
-	dialer.presetSlug["localhost:8094"] = "cofb"
-	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "cofb"}}
+	dialer.presetSlug["localhost:8094"] = "demo"
+	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "demo"}}
 	r.AddCartridge("localhost:8094")
 
 	dialer.triggerDeregister("localhost:8093")
@@ -590,32 +656,169 @@ func TestRegistry_NodeDisconnect_SharedGameSurvivesViaOtherNode(t *testing.T) {
 
 func TestRegistry_PickNode_ReturnsLeastLoadedConnectedNode(t *testing.T) {
 	dialer := newFakeDialer()
-	dialer.presetSlug["localhost:8093"] = "cofb"
-	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "cofb"}}
-	r := NewRegistry(dialer.Dial, testConfig(), []string{"localhost:8093"})
+	dialer.presetSlug["localhost:8093"] = "demo"
+	dialer.presetNC["localhost:8093"] = []Nomenclature{{Slug: "demo"}}
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
 	r.Start()
 
-	dialer.presetSlug["localhost:8094"] = "cofb"
-	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "cofb"}}
+	dialer.presetSlug["localhost:8094"] = "demo"
+	dialer.presetNC["localhost:8094"] = []Nomenclature{{Slug: "demo"}}
 	r.AddCartridge("localhost:8094")
 
 	dialer.conn("localhost:8093").activeRooms = []Room{{InstanceID: "a"}, {InstanceID: "b"}}
 	dialer.conn("localhost:8094").activeRooms = nil // fewer rooms - less loaded
 
-	addr, ok := r.PickNode("cofb.cofb")
+	nodeKey, ok := r.PickNode("demo.demo")
 	if !ok {
 		t.Fatalf("expected PickNode to find a serving node")
 	}
-	if addr != "localhost:8094" {
-		t.Fatalf("expected the least-loaded node localhost:8094, got %s", addr)
+	if want := r.cartridgeNodesMap["localhost:8094"]; nodeKey != want {
+		t.Fatalf("expected the least-loaded node's key (localhost:8094 -> %s), got %s", want, nodeKey)
 	}
 }
 
 func TestRegistry_PickNode_UnknownKey_ReturnsNotOK(t *testing.T) {
 	dialer := newFakeDialer()
-	r := NewRegistry(dialer.Dial, testConfig(), nil)
+	r := newTestRegistry(t, dialer.Dial, testConfig(), nil)
 
 	if _, ok := r.PickNode("nothing.here"); ok {
 		t.Fatalf("expected PickNode to report not-ok for a key no node serves")
+	}
+}
+
+func TestRegistry_AllStatuses_CoversEveryTrackedEntry(t *testing.T) {
+	dialer := newFakeDialer()
+	dialer.dead["localhost:8094"] = true
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093", "localhost:8094"})
+
+	r.Start()
+
+	statuses := r.AllStatuses()
+	if len(statuses) != 2 {
+		t.Fatalf("expected 2 tracked entries, got %d", len(statuses))
+	}
+
+	byAddr := make(map[string]Status, len(statuses))
+	for _, st := range statuses {
+		byAddr[st.Addr] = st
+	}
+	if byAddr["localhost:8093"].State != StateConnected {
+		t.Fatalf("expected localhost:8093 to be StateConnected, got %v", byAddr["localhost:8093"].State)
+	}
+	if byAddr["localhost:8094"].State != StateDead {
+		t.Fatalf("expected localhost:8094 to be StateDead, got %v", byAddr["localhost:8094"].State)
+	}
+}
+
+// TestRegistry_RetryDueCartridges_StopsEarlyOnSchedulerStop is a
+// regression test: retryDueCartridges used to dial every due node in one
+// uninterrupted sequential pass, so a shutdown request arriving mid-batch
+// (schedulerStop closed while one node's attemptConnect was still in
+// flight) had to wait out every remaining node's own attemptConnect too
+// before the scheduler's own select ever got a chance to notice it -
+// several pending-retry nodes could add up to a many-second-long,
+// user-visible hang on shutdown (StopRetryScheduler's own <-schedulerDone
+// wait has no timeout of its own). The loop now checks schedulerStop
+// between nodes and bails out of the rest of the batch immediately.
+func TestRegistry_RetryDueCartridges_StopsEarlyOnSchedulerStop(t *testing.T) {
+	dialer := newFakeDialer()
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093", "localhost:8094"})
+	r.Start()
+
+	// Fail a ping on both, putting both into StatePendingRetry, then force
+	// their NextAttempt into the past so retryDueCartridges treats both as
+	// due right now, without waiting on testConfig's real RetryInterval.
+	for _, addr := range []string{"localhost:8093", "localhost:8094"} {
+		dialer.conn(addr).failPing = true
+	}
+	r.PingKnown()
+	r.mu.Lock()
+	for _, node := range r.cartridgeNodes {
+		node.nextAttempt = time.Now().Add(-time.Second)
+	}
+	r.mu.Unlock()
+
+	// Start() itself already dialed both addrs once each - baseline the
+	// counts so the assertion below only looks at what retryDueCartridges
+	// itself does.
+	baseline := dialer.callCount("localhost:8093") + dialer.callCount("localhost:8094")
+
+	entered := make(chan struct{})
+	release := make(chan struct{})
+	var enterOnce sync.Once
+	dialer.onDial = func(addr string) {
+		enterOnce.Do(func() { close(entered) })
+		<-release
+	}
+
+	// retryDueCartridges reads r.schedulerStop directly - set it up the
+	// same way StartRetryScheduler would, without the real 1s ticker.
+	r.schedulerStop = make(chan struct{})
+
+	done := make(chan struct{})
+	go func() {
+		r.retryDueCartridges()
+		close(done)
+	}()
+
+	<-entered // the first due addr's attemptConnect is now blocked in Dial
+	close(r.schedulerStop)
+	close(release) // let the in-flight attemptConnect finish
+
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("retryDueCartridges did not return after schedulerStop was closed")
+	}
+
+	total := dialer.callCount("localhost:8093") + dialer.callCount("localhost:8094") - baseline
+	if total != 1 {
+		t.Fatalf("expected only the in-flight node to be dialed once schedulerStop closed, got %d dial calls", total)
+	}
+}
+
+// TestRegistry_StopRetryScheduler_DoesNotHangOnStuckInFlightNode is a
+// regression test: the previous fix (skip the rest of the batch once
+// schedulerStop is closed) only helps when there's more than one due node
+// queued - with exactly one, there's nothing left to skip, and
+// StopRetryScheduler's own <-schedulerDone wait had no bound of its own,
+// so a single genuinely-stuck in-flight attemptConnect (dialing/fetching a
+// dead cartridge that never responds, rather than one that promptly
+// refuses the connection) still hung every shutdown for as long as that
+// one call happened to be running. StopRetryScheduler now gives up after
+// stopRetrySchedulerGrace instead of waiting indefinitely.
+func TestRegistry_StopRetryScheduler_DoesNotHangOnStuckInFlightNode(t *testing.T) {
+	dialer := newFakeDialer()
+	r := newTestRegistry(t, dialer.Dial, testConfig(), []string{"localhost:8093"})
+	r.Start()
+
+	dialer.conn("localhost:8093").failPing = true
+	r.PingKnown()
+	r.mu.Lock()
+	for _, node := range r.cartridgeNodes {
+		node.nextAttempt = time.Now().Add(-time.Second)
+	}
+	r.mu.Unlock()
+
+	entered := make(chan struct{})
+	var once sync.Once
+	dialer.onDial = func(addr string) {
+		once.Do(func() { close(entered) })
+		select {} // blocks forever - a cartridge that never responds at all
+	}
+
+	r.StartRetryScheduler()
+
+	select {
+	case <-entered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("scheduler never attempted the due retry")
+	}
+
+	start := time.Now()
+	r.StopRetryScheduler()
+	if elapsed := time.Since(start); elapsed > time.Second {
+		t.Fatalf("StopRetryScheduler took %v to return with a stuck in-flight dial - expected it to give up "+
+			"around stopRetrySchedulerGrace (%v)", elapsed, stopRetrySchedulerGrace)
 	}
 }

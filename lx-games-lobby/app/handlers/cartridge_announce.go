@@ -50,6 +50,9 @@ type CartridgeAnnounceHandler struct {
 	*lxHttp.Resource
 }
 
+var _ kernel.IHttpResource = (*CartridgeAnnounceHandler)(nil)
+
+/** @constructor kernel.CHttpResource */
 func NewCartridgeAnnounceHandler() kernel.IHttpResource {
 	return &CartridgeAnnounceHandler{
 		Resource: lxHttp.NewResource(kernel.HttpResourceConfig{CRequestForm: NewAnnounceForm}),

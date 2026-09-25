@@ -1,14 +1,17 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/epicoon/lx-games-lobby/app/handlers"
 	"github.com/epicoon/lx-games-lobby/cnv"
 	"github.com/epicoon/lxgo/jspp"
 	jsppComp "github.com/epicoon/lxgo/jspp/component"
 	"github.com/epicoon/lxgo/kernel"
+	wsComp "github.com/epicoon/lxgo/ws/component"
 )
 
-func InitRoutes(app cnv.IApp) {
+func InitRoutes(app cnv.IApp) error {
 	router := app.Router()
 
 	router.RegisterFileAssets(kernel.AssetsList{
@@ -26,5 +29,19 @@ func InitRoutes(app cnv.IApp) {
 
 	router.RegisterResources(kernel.HttpResourcesList{
 		"/cartridge/announce[POST]": handlers.NewCartridgeAnnounceHandler,
+		"/game/get":                 handlers.NewGameGetHandler,
+		handlers.GameDepsRoute:      handlers.NewGameDepsHandler(app.CartridgesRegistry()),
+		handlers.GameAssetsRoute:    handlers.NewGameAssetsHandler(app.CartridgesRegistry()),
 	})
+
+	// Browser-facing lobby channel
+	ws, err := wsComp.AppComponent(app)
+	if err != nil {
+		return fmt.Errorf("WSServer component required: %w", err)
+	}
+	ws.Router().RegisterResources(kernel.HttpResourcesList{
+		"/nomenclature": handlers.NewNomenclatureHandler,
+	})
+
+	return nil
 }

@@ -4,9 +4,9 @@ go 1.25.0
 
 require (
 	github.com/epicoon/lxgo/cmd v0.1.0-alpha.10
-	github.com/epicoon/lxgo/jspp v0.1.0-alpha.38
-	github.com/epicoon/lxgo/kernel v0.1.0-alpha.31
-	github.com/epicoon/lxgo/ws v0.1.0-alpha.9
+	github.com/epicoon/lxgo/jspp v0.1.0-alpha.39
+	github.com/epicoon/lxgo/kernel v0.1.0-alpha.32
+	github.com/epicoon/lxgo/ws v0.1.0-alpha.11
 )
 
 require (
