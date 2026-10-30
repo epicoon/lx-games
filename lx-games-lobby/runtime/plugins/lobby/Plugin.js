@@ -15,6 +15,8 @@ lx.import('client/dev/');
 // @lx:namespace lxGames.lobby;
 class Plugin extends lx.Plugin {
 	run() {
+		window.lxAuth.run();
+
 		// @lx:<mode DEV:
         lx.app.dependencies.promiseModules({
             modules: ['lx.EggMenu'],

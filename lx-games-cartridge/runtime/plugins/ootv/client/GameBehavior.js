@@ -42,6 +42,7 @@ class GameBehavior extends lx.Behavior {
         this.world = new lxGames.ootv.World({
             game : this,
             canvas : lx(this.getPlugin())>>canvas,
+            color: 0x474770,
             lights : [ 0x000000, 0x777777, 0xffffff ],
             cameraPosition : {x:0, y:1033, z:1033},
             cameraConfig: {

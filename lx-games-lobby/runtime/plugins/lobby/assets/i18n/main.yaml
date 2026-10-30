@@ -32,10 +32,24 @@ en-EN:
   lobby.cancel: Cancel
   lobby.create: Create
   lobby.signInTitle: Sign in to play online
-  lobby.signInText: You will be taken to the lx-auth form and brought back here afterwards. Offline games stay available without an account.
-  lobby.continue: Continue
+  lobby.signUpTitle: Create an account to play online
+  lobby.signInText: Offline games stay available without an account.
+  lobby.login: Login
+  lobby.password: Password
+  lobby.confirmPassword: Confirm password
+  lobby.passwordHint: Minimum 8 characters, both upper and lower case, a digit and a special character
+  lobby.email: Email
+  lobby.emailHint: Optional - add it to link this account to Google sign-in later
+  lobby.confirmPending: Account created - check your email to confirm it before signing in.
+  lobby.signUp: Sign up
+  lobby.noAccount: Don't have an account? Sign up
+  lobby.haveAccount: Already have an account? Sign in
+  lobby.authFieldsRequired: Enter a login and password
+  lobby.passwordMismatch: Passwords don't match
+  lobby.weakPassword: Password doesn't meet the requirements above
+  lobby.authFailed: Authentication failed
+  lobby.authNetworkError: Something went wrong. Please try again.
   lobby.google: Continue with Google
-  lobby.comingSoon: soon
   lobby.moreGames: More games coming
   lobby.hostedBy: "Host: ${host}"
   lobby.defaultRoomName: "${host}'s table"
@@ -76,10 +90,24 @@ ru-RU:
   lobby.cancel: Отмена
   lobby.create: Создать
   lobby.signInTitle: Войдите, чтобы играть онлайн
-  lobby.signInText: Вы перейдёте на форму lx-auth и после входа вернётесь сюда. Офлайн-игры доступны и без аккаунта.
-  lobby.continue: Продолжить
+  lobby.signUpTitle: Зарегистрируйтесь, чтобы играть онлайн
+  lobby.signInText: Офлайн-игры доступны и без аккаунта.
+  lobby.login: Логин
+  lobby.password: Пароль
+  lobby.confirmPassword: Подтверждение пароля
+  lobby.passwordHint: Минимум 8 символов, строчные и заглавные буквы, цифра и спецсимвол
+  lobby.email: Email
+  lobby.emailHint: Необязательно - пригодится, если потом захотите привязать вход через Google
+  lobby.confirmPending: Аккаунт создан - подтвердите email по ссылке из письма, чтобы войти.
+  lobby.signUp: Зарегистрироваться
+  lobby.noAccount: Нет аккаунта? Зарегистрироваться
+  lobby.haveAccount: Уже есть аккаунт? Войти
+  lobby.authFieldsRequired: Введите логин и пароль
+  lobby.passwordMismatch: Пароли не совпадают
+  lobby.weakPassword: Пароль не соответствует требованиям выше
+  lobby.authFailed: Ошибка авторизации
+  lobby.authNetworkError: Что-то пошло не так. Попробуйте ещё раз.
   lobby.google: Войти через Google
-  lobby.comingSoon: скоро
   lobby.moreGames: Скоро будут ещё игры
   lobby.hostedBy: "Хозяин: ${host}"
   lobby.defaultRoomName: "Стол игрока ${host}"

@@ -19,11 +19,12 @@ class GuiMain extends lx.GuiNode {
 
 	subscribeEvents() {
 		const plugin = this.getPlugin();
-		plugin.on('lobby.joinRoom',    e  => _joinRoom(this, e.getData().room));
-		plugin.on('lobby.watchRoom',   e  => _watchRoom(this, e.getData().room));
-		plugin.on('lobby.playOffline', e  => _playOffline(this, e.getData().gameKey));
-		plugin.on('lobby.openCreate',  e  => _openCreate(this, e.getData().gameKey));
-		plugin.on('lobby.openSignIn',  () => _openSignIn(this));
+		plugin.on('lobby.joinRoom',     e  => _joinRoom(this, e.getData().room));
+		plugin.on('lobby.watchRoom',    e  => _watchRoom(this, e.getData().room));
+		plugin.on('lobby.playOffline',  e  => _playOffline(this, e.getData().gameKey));
+		plugin.on('lobby.openCreate',   e  => _openCreate(this, e.getData().gameKey));
+		plugin.on('lobby.openSignIn',   () => _openSignIn(this));
+		plugin.on('lobby.user.changed', () => _closeSignInOnLogin(this));
 
 		plugin.on('lobby.gameBundleReceived', e => {
 			const gameKey = e.getData().gameKey;
@@ -177,20 +178,23 @@ function _openOverlay(self) {
 }
 
 function _openSignIn(self) {
-	const modal = _openOverlay(self);
-
-	modal.add(lx.Box, {css: 'lobby-modal-title', text: lx.i18n(lobby.signInTitle)});
-	modal.add(lx.Box, {css: 'lobby-modal-sub', text: lx.i18n(lobby.signInText)});
-
-	const foot = modal.add(lx.Box, {css: 'lobby-modal-foot-col'});
-	const cont = foot.add(lx.Box, {css: ['lobby-btn', 'lobby-btn-primary'], text: lx.i18n(lobby.continue)});
-	cont.click(() => {
-		self.getUser().signIn();
-		_closeModal(self);
+	const root = self.getElem('modalRoot');
+	root.clear();
+	self._signInPopup = root.add(lxGames.lobby.AuthPopup, {
+		user: self.getUser(),
+		onClose: () => { self._signInPopup = null; }
 	});
-	foot.add(lx.Box, {css: ['lobby-btn', 'lobby-btn-disabled'], text: lx.i18n(lobby.google) + ' · ' + lx.i18n(lobby.comingSoon)});
-	const cancel = foot.add(lx.Box, {css: ['lobby-btn', 'lobby-btn-ghost'], text: lx.i18n(lobby.cancel)});
-	cancel.click(() => _closeModal(self));
+}
+
+// The Google/email-confirmation tabs can log this tab in without it ever
+// touching the popup's own submit path (see User.js's focus listener) -
+// close the popup it's still holding open, but only if it's still ours
+// and only on an actual login.
+function _closeSignInOnLogin(self) {
+	if (!self._signInPopup) return;
+	if (self.getUser().isGuest()) return;
+	self._signInPopup.close();
+	self._signInPopup = null;
 }
 
 function _openCreate(self, gameKey) {
@@ -230,7 +234,7 @@ function _renderCreateModal(self) {
 	const nameField = modal.add(lx.Box, {css: 'lobby-field'});
 	nameField.add(lx.Box, {css: 'lobby-field-label', text: lx.i18n(lobby.tableName)});
 	const user = self.getUser();
-	const nameValue = draft.name !== undefined ? draft.name : lx.i18n(lobby.defaultRoomName, {host: user.login});
+	const nameValue = draft.name !== undefined ? draft.name : lx.i18n(lobby.defaultRoomName, {host: user.displayName()});
 	const nameInput = nameField.add(lx.Input, {css: 'lobby-input', value: nameValue});
 
 	const seatsField = modal.add(lx.Box, {css: 'lobby-field'});
@@ -261,13 +265,13 @@ function _renderCreateModal(self) {
 function _submitCreate(self, name) {
 	const draft = self._draft;
 	const user = self.getUser();
-	const finalName = (name || '').trim() || lx.i18n(lobby.defaultRoomName, {host: user.login});
+	const finalName = (name || '').trim() || lx.i18n(lobby.defaultRoomName, {host: user.displayName()});
 
 	self.getCore().rooms.create({
 		id: Date.now(),
 		game: draft.game,
 		name: finalName,
-		host: user.login,
+		host: user.displayName(),
 		seats: [user.login],
 		max: draft.seats,
 		state: 'waiting',

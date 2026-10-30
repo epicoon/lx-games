@@ -32,6 +32,10 @@ func NewApp() (cnv.IApp, error) {
 		return nil, err
 	}
 
+	if err := subscribeEvents(app); err != nil {
+		return nil, fmt.Errorf("can not subscribe events: %w", err)
+	}
+
 	registry, err := buildCartridgesRegistry(app)
 	if err != nil {
 		return nil, fmt.Errorf("can not build cartridges registry: %w", err)

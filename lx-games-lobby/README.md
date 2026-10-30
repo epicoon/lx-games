@@ -1,6 +1,6 @@
 # lx-games-lobby
 
-> Actual version: `v0.1.0-alpha.3`. [Details](./CHANGE_LOG.md)
+> Actual version: `v0.1.0-alpha.4`. [Details](./CHANGE_LOG.md)
 
 ## Prepare
 
@@ -16,6 +16,13 @@ apply. `runtime/config-local.yaml` sets `Cartridges` - which cartridges
 this lobby is allowed to dial, see its own comment - and a few other
 per-deployment overrides; `config.yaml`'s `Local: config-local.yaml` merges
 it in.
+
+Online play needs an [lxgo/auth](https://github.com/epicoon/lxgo/tree/master/auth) instance to authenticate
+against: register this lobby as a client on it (`client:new --redirect-uri=<this lobby's own
+origin>/auth-callback` - the URI itself is never dialed, see "Sign in / sign up" below, but still has to match
+exactly what's registered) and set the printed `ID`/`Secret`, together with that `redirect_uri` and the
+`lxgo/auth` instance's own URL, under `Components.Auth` in `runtime/config-local.yaml`. That instance's own CORS
+config also needs this lobby's origin added to `Components.Cors.Origins`.
 
 ## Running locally
 
@@ -61,3 +68,15 @@ the image.
 `/` and `/admin` (`LobbyPlugin`/`AdminPlugin`, browser-facing) are page
 routes, not part of this protocol - the lobby's own player-facing WS
 channel doesn't exist yet as a distinct API.
+
+## Sign in / sign up
+
+The lobby's own sign-in popup (`client/guiNodes/GuiMain.js`'s `_openSignIn`) authenticates directly against
+[lxgo/auth](https://github.com/epicoon/lxgo/tree/master/auth) without ever navigating the browser away from the
+lobby's page: `client/src/User.js`'s `signIn`/`signUp` call lxgo/auth's session-free `/remote/login`/
+`/remote/signup` for an authorization code, then this lobby's own `/auth-exchange` (an
+[lxgo/auth_client](https://github.com/epicoon/lxgo/tree/master/auth_client) `TokenExchangeHandler`) to turn that
+code into a token pair, written to `localStorage` for lxgo/auth's JS bundle (`window.lxAuth`, loaded by
+`runtime/templates/layout.html`) to pick up - `window.lxAuth.getUserData()` then supplies the real login shown in
+the topbar. `/get-user`/`/auth-refresh`/`/logout` are the same package's other ready-made proxies, wired up the
+same way for when the lobby needs them.

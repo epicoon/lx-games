@@ -1,6 +1,6 @@
 # lx-games-cartridge
 
-> Actual version: `v0.1.0-alpha.3`. [Details](./CHANGE_LOG.md)
+> Actual version: `v0.1.0-alpha.4`. [Details](./CHANGE_LOG.md)
 
 ## Prepare
 

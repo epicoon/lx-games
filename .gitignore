@@ -1,5 +1,9 @@
 .idea
 
+dev/defaults.yaml
+dev/deploy_report
+dev/configtool/configtool
+
 lx-games-lobby/bin
 lx-games-cartridge/js_fails
 lx-games-lobby/runtime/.env

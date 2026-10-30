@@ -5,6 +5,7 @@ import (
 
 	"github.com/epicoon/lx-games-lobby/app/handlers"
 	"github.com/epicoon/lx-games-lobby/cnv"
+	authClient "github.com/epicoon/lxgo/auth_client"
 	"github.com/epicoon/lxgo/jspp"
 	jsppComp "github.com/epicoon/lxgo/jspp/component"
 	"github.com/epicoon/lxgo/kernel"
@@ -32,6 +33,15 @@ func InitRoutes(app cnv.IApp) error {
 		"/game/get":                 handlers.NewGameGetHandler,
 		handlers.GameDepsRoute:      handlers.NewGameDepsHandler(app.CartridgesRegistry()),
 		handlers.GameAssetsRoute:    handlers.NewGameAssetsHandler(app.CartridgesRegistry()),
+
+		// lxgo/auth_client's ready-made handlers, under the paths configured
+		// in Components.Auth - see runtime/config.yaml.
+		"/auth-state":    authClient.NewStateHandler,
+		"/auth-callback": authClient.NewAuthCallbackHandler,
+		"/auth-exchange": authClient.NewTokenExchangeHandler,
+		"/auth-refresh":  authClient.NewRefreshHandler,
+		"/logout":        authClient.NewLogoutHandler,
+		"/get-user":      handlers.NewGetUserHandler,
 	})
 
 	// Browser-facing lobby channel

@@ -4,7 +4,7 @@
 class World extends lxGames.threed.World {
 	constructor(config) {
 		super(config);
-		
+
 		this.game = config.game;
 		this.cameraSlider = null;
 		this.stuffList = null;
@@ -30,7 +30,7 @@ class World extends lxGames.threed.World {
 
 		this.table = this.newMesh({
 			geometry: new lxGames.threed.GeometryCutBox(w, 40, d, [0, 0, 0, 0], lx>>>Const.fisSMOOTH),
-			material: new THREE.MeshLambertMaterial({ map : this.getTexture('olha') })
+			material: new THREE.MeshLambertMaterial({ map : this.getTexture('wood2.png') })
 		});
 
 		this.table.position.y = -22;

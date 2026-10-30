@@ -1,0 +1,14 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+{{ .Auth }}
+<script defer src="{{ .AuthServer }}/js-client/remote.js"></script>
+{{ block "content" . }}{{ end }}
+</body>
+</html>
+{{ end }}

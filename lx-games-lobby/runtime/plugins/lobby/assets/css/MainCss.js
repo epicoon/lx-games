@@ -568,6 +568,11 @@ class MainCss extends lx.PluginCssAsset {
             color: c.muted,
             marginBottom: '5px',
         });
+        css.addClass('lobby-field-hint', {
+            fontSize: '11.5px',
+            color: c.muted,
+            margin: '-6px 0 8px',
+        });
         css.addClass('lobby-input', {
             width: '100%',
             padding: '8px 10px',
@@ -577,6 +582,36 @@ class MainCss extends lx.PluginCssAsset {
             color: c.text,
             fontSize: '14px',
             fontFamily: 'inherit',
+        });
+        css.addClass('lobby-input-pwd', {
+            paddingRight: '34px',
+        });
+        css.addClass('lobby-input-wrap', {
+            position: 'relative',
+        });
+        css.addClass('lobby-eye-btn', {
+            position: 'absolute',
+            top: '50%',
+            right: '8px',
+            width: '20px',
+            height: '20px',
+            transform: 'translateY(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: c.muted,
+            cursor: 'pointer',
+        });
+        css.addClass('lobby-field-error', {
+            color: c.warn,
+            fontSize: '12.5px',
+            margin: '-6px 0 12px',
+        });
+        css.addClass('lobby-link', {
+            color: c.muted,
+            fontSize: '12.5px',
+            textAlign: 'center',
+            cursor: 'pointer',
         });
         css.addClass('lobby-seg', {
             display: 'flex',

@@ -1,7 +1,7 @@
 Import: [config-local.yaml]
 
 Host: ${APP_HOST:-localhost}
-Port: ${APP_PORT:-8090}
+Port: ${APP_PORT:-8000}
 
 # Forwarded to the browser via lx-app.yaml's params (@config(...)) - the
 # browser's own WS client needs an explicit port because it never
@@ -11,7 +11,20 @@ Port: ${APP_PORT:-8090}
 Params:
   AppPortExternal: ${APP_PORT_EXTERNAL:-8000}
 
+Templates:
+  - Dir: runtime/templates
+    Layout: layout
+
 Components:
+  SessionStorage:
+    CookieName: lxlobbysessionid
+    MaxLifeTime: 3600
+  Auth:
+    StateUri: /auth-state
+    ExchangeUri: /auth-exchange
+    LogoutUri: /logout
+    RefreshUri: /auth-refresh
+    UserDataUri: /get-user
   WSServer:
     DefaultChannel:
       Key: lobby

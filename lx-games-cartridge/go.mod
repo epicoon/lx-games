@@ -4,9 +4,9 @@ go 1.25.0
 
 require (
 	github.com/epicoon/lxgo/cmd v0.1.0-alpha.10
-	github.com/epicoon/lxgo/cors v0.1.0-alpha.1
-	github.com/epicoon/lxgo/jspp v0.1.0-alpha.39
-	github.com/epicoon/lxgo/kernel v0.1.0-alpha.32
+	github.com/epicoon/lxgo/cors v0.1.0-alpha.2
+	github.com/epicoon/lxgo/jspp v0.1.0-alpha.40
+	github.com/epicoon/lxgo/kernel v0.1.0-alpha.33
 	github.com/epicoon/lxgo/ws v0.1.0-alpha.11
 	gopkg.in/yaml.v3 v3.0.1
 )

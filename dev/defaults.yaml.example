@@ -1,0 +1,35 @@
+# Copy to defaults.yaml to override any of these - every key here is
+# optional, `deploy.sh` falls back to its own built-in default for
+# anything missing or absent (including this whole file). See
+# dev/README.md.
+
+Paths:
+  # Where lxgo-auth lives on disk (its own docker-setup.sh's directory,
+  # i.e. the one holding Dockerfile/docker-compose.yml) - a clone of the
+  # private goprg workspace's lxgo-auth, an existing checkout of the
+  # public lxgo monorepo, anything. Left unset, deploy.sh clones
+  # git@github.com:epicoon/lxgo.git as ../lxgo (a sibling of lx-games)
+  # and uses ../lxgo/auth.
+  lxgo-auth: /path/to/lxgo-auth
+
+Ports:
+  LobbyApp: 8100
+  CartridgeApp: 8110
+  AuthApp: 8120
+  AuthDb: 8121
+
+Ignore:
+  # Set true to skip deploying that service entirely (clear.sh skips
+  # tearing it down too, via dev/deploy_report).
+  Auth: false
+  Lobby: false
+  Cartridge: false
+
+AuthApp:
+  # The lobby's OAuth client secret, passed as client:new's --secret
+  # instead of letting lxgo-auth generate a random one - useful for a
+  # reproducible dev stack. Only read the first time the client gets
+  # registered (same guard as the rest of lobby's config-local.yaml -
+  # see dev/README.md); changing it later has no effect on an
+  # already-registered client.
+  Secret: ""

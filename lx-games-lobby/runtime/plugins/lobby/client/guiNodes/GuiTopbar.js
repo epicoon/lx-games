@@ -7,9 +7,9 @@ class GuiTopbar extends lx.GuiNode {
 	subscribeEvents() {
 		const plugin = this.getPlugin();
 
-		plugin.on('lobby.user.authAttemptDone', e => _render(this));
+		plugin.on('lobby.user.authAttemptDone', e=>_render(this));
 
-		plugin.on('lobby.user.changed', e => _render(this));
+		plugin.on('lobby.user.changed', e=>_render(this));
 	}
 }
 
@@ -26,12 +26,12 @@ function _render(self) {
 		const btn = new lx.Box({css: ['lobby-btn', 'lobby-btn-primary'], text: lx.i18n(lobby.signIn)});
 		btn.click(() => self.triggerPluginEvent('lobby.openSignIn'));
 	} else {
-		const initial = lxGames.lobby.UiHelpers.initial(user.login);
+		const initial = lxGames.lobby.UiHelpers.initial(user.displayName());
 		const view = lx.ml(`
 			<lx.Box> .lobby-user
 				<lx.Box> .lobby-avatar (text:'${initial}')\
 					#style('backgroundColor', lxGames.lobby.UiHelpers.personColor(user.login))
-				<lx.Box> .lobby-user-name (text:user.login)
+				<lx.Box> .lobby-user-name (text:user.displayName())
 				<lx.Box> @out.lobby-btn.lobby-btn-small.lobby-btn-ghost (text:lx.i18n(lobby.signOut))
 		`);
 		view.out.click(() => user.signOut());

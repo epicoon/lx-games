@@ -1,4 +1,22 @@
 ------------------------------------------------------------------------------------------------------------------------
+Date: 2026.11.04
+Version: v0.1.0-alpha.4
+Changes:
+- add: real sign-in/sign-up popup (`AuthPopup.js`), replacing the previous "Continue"/"Google (coming soon)"
+  placeholder - login/password forms (with a show/hide "eye" toggle on each password field) and a working Google
+  sign-in button, backed by `lxgo/auth`'s session-free `/remote/login`/`/remote/signup`/Google-popup flow
+  (`window.lxAuth`, loaded from `lxgo/auth`'s own `/js-client/remote.js`) and this lobby's own
+  `/auth-state`/`/auth-callback`/`/auth-exchange`/`/auth-refresh`/`/logout`/`/get-user` endpoints
+  (`lxgo/auth_client`'s ready-made handlers, plus a local `/get-user` wrapper)
+- add: `User.displayName()` - the signed-in account's Google display name if known, its login otherwise; used in
+  the topbar and as a room's default host name, instead of always showing the raw login (an email address, for a
+  Google account)
+- add: signing in from a different tab/flow (the Google sign-in tab, an email-confirmation link) now closes this
+  tab's still-open sign-in popup automatically once it notices the login, instead of leaving it open and stale
+- chore: bumped lxgo deps to auth_client v0.1.0-alpha.6, jspp v0.1.0-alpha.40, kernel v0.1.0-alpha.33, session
+  v0.1.0-alpha.8
+
+------------------------------------------------------------------------------------------------------------------------
 Date: 2026.10.06
 Version: v0.1.0-alpha.3
 Changes:

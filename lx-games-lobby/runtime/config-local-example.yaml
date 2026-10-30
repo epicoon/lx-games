@@ -25,3 +25,14 @@ Components:
   JSPreprocessor:
     Mode: DEV
     PluginCacheType: dev
+  # ID/Secret come from registering this lobby as an OAuth client on the
+  # lxgo-auth instance it authenticates against (`client:new`) - per
+  # machine, since each developer's lxgo-auth instance knows its own
+  # clients. RedirectUri isn't actually dialed by this integration (no
+  # browser redirect - see lxgo-auth's README, "no-redirect" flow) but
+  # still has to match exactly what was registered.
+  Auth:
+    ID: 0
+    Secret: ""
+    RedirectUri: http://localhost:8090/auth-callback
+    Server: http://localhost:8080
